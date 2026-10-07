@@ -1,0 +1,134 @@
+/* Design tokens — Key Light. Source of truth: Docs/Design/DesignSystem.md */
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('../assets/fonts/archivo-variable-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../assets/fonts/jetbrains-mono-variable-latin.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-matched fallbacks to limit layout shift while the web fonts load. */
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans');
+  size-adjust: 104%;
+  ascent-override: 84%;
+  descent-override: 20%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Menlo'), local('Consolas'), local('DejaVu Sans Mono');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
+:root {
+  color-scheme: dark;
+
+  /* Colour */
+  --color-void: #0b0c0e;
+  --color-surface: #121418;
+  --color-raised: #1a1d22;
+  --color-line: #2a2e35;
+  --color-line-strong: #3a3f48;
+  --color-text: #edeae4;
+  --color-text-muted: #a39f98;
+  --color-key: #f2b66d;
+  --color-on-key: #0b0c0e;
+  --color-fill: #4a5d7a;
+
+  /* Light (decorative only, never behind text brighter than --color-raised) */
+  --light-key: rgb(242 182 109 / 0.16);
+  --light-key-strong: rgb(242 182 109 / 0.26);
+  --light-fill: rgb(74 93 122 / 0.22);
+  --rim: linear-gradient(
+    135deg,
+    rgb(242 182 109 / 0.45),
+    rgb(255 255 255 / 0.08) 35%,
+    rgb(255 255 255 / 0.02) 70%
+  );
+  --rim-strong: linear-gradient(
+    135deg,
+    rgb(242 182 109 / 0.85),
+    rgb(255 255 255 / 0.14) 40%,
+    rgb(255 255 255 / 0.04) 75%
+  );
+
+  /* Type */
+  --font-sans: 'Archivo', 'Archivo Fallback', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
+  --stretch-display: 118%;
+  --stretch-body: 100%;
+
+  --step--1: 0.8125rem;
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --step-3: clamp(2rem, 1.6rem + 2vw, 3rem);
+  --step-4: clamp(2.375rem, 1.6rem + 3.9vw, 4.5rem);
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.25;
+  --leading-body: 1.6;
+  --tracking-display: -0.02em;
+  --tracking-label: 0.06em;
+
+  /* Space (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --max-width: 76rem;
+  --measure: 68ch;
+
+  /* Radii */
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 14px;
+  --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-card: 0 18px 40px -18px rgb(0 0 0 / 0.7);
+  --shadow-hero: 0 40px 80px -30px rgb(0 0 0 / 0.8);
+
+  /* Motion */
+  --dur-fast: 160ms;
+  --dur-base: 400ms;
+  --dur-slow: 700ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Focus */
+  --focus-ring: 2px solid var(--color-key);
+  --focus-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}
