@@ -1,0 +1,45 @@
+---
+import { STATUS_LABELS, type Status } from '../lib/products';
+
+interface Props {
+  status: Status;
+}
+const { status } = Astro.props;
+---
+
+<span class="status-badge" data-status={status}>{STATUS_LABELS[status]}</span>
+
+<style>
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-pill);
+    background: rgb(11 12 14 / 0.7);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  /* A small "light" whose intensity shows how far along the product is. */
+  .status-badge::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--color-key);
+    opacity: var(--lamp, 1);
+    box-shadow: 0 0 0.5rem rgb(242 182 109 / calc(var(--lamp, 1) * 0.8));
+  }
+
+  [data-status='concept'] { --lamp: 0.3; }
+  [data-status='in-development'] { --lamp: 0.55; }
+  [data-status='early-access'] { --lamp: 0.8; }
+  [data-status='released'] { --lamp: 1; }
+</style>

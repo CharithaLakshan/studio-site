@@ -1,0 +1,40 @@
+---
+import { site } from '../config/site';
+
+const links = [
+  { label: 'YouTube', href: site.socials.youtube },
+  { label: 'GitHub', href: site.socials.github },
+  { label: 'Email', href: site.email ? `mailto:${site.email}` : '' },
+].filter((l) => l.href);
+---
+
+<ul class="social-links">
+  {
+    links.map((l) => (
+      <li>
+        <a href={l.href} rel={l.href.startsWith('http') ? 'me noopener' : undefined}>
+          {l.label}
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .social-links a {
+    display: inline-block;
+    padding-block: var(--space-2);
+  }
+</style>

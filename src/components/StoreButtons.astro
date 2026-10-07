@@ -1,0 +1,84 @@
+---
+import { STORES, type Product } from '../lib/products';
+
+interface Props {
+  links: Product['data']['storeLinks'];
+}
+const { links } = Astro.props;
+const stores = STORES.filter(([key]) => links[key] !== undefined).map(([key, name]) => ({
+  name,
+  href: links[key] ?? '',
+}));
+---
+
+{
+  stores.length > 0 && (
+    <ul class="store-buttons" role="list">
+      {stores.map((s) => (
+        <li>
+          {s.href ? (
+            <a class="store-button" href={s.href} rel="noopener">
+              <span class="store-button-name">{s.name}</span>
+              <span class="store-button-note">
+                Open store page <span aria-hidden="true">↗</span>
+              </span>
+            </a>
+          ) : (
+            <span class="store-button" aria-disabled="true">
+              <span class="store-button-name">{s.name}</span>
+              <span class="store-button-note">Coming soon</span>
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .store-buttons {
+    display: grid;
+    gap: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .store-button {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: 3rem;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-key);
+    border-radius: var(--radius-m);
+    background: var(--color-key);
+    color: var(--color-on-key);
+    text-decoration: none;
+    transition: box-shadow var(--dur-base) var(--ease-out);
+  }
+
+  a.store-button:hover {
+    box-shadow: 0 0 2rem -0.25rem rgb(242 182 109 / 0.5);
+  }
+
+  .store-button-name {
+    font-weight: 650;
+  }
+
+  .store-button-note {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  /* Disabled: unlit. Dashed outline, muted but still readable (AA). */
+  .store-button[aria-disabled='true'] {
+    border-style: dashed;
+    border-color: var(--color-line-strong);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: default;
+  }
+</style>
