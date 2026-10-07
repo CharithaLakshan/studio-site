@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
+import { PRODUCT_TYPES } from '../../content.config';
+import { site } from '../../config/site';
+import { TYPE_LABELS, getProducts } from '../../lib/products';
+
+const products = await getProducts();
+const groups = PRODUCT_TYPES.map((type) => ({
+  type,
+  label: TYPE_LABELS[type].many,
+  items: products.filter((p) => p.data.type === type),
+})).filter((g) => g.items.length > 0);
+const description = `Every game, app, tool and experience from ${site.name}, grouped by type.`;
+---
+
+<BaseLayout title="Products" description={description}>
+  <PageHeader title="Products" lede={description}>
+    {
+      groups.length > 1 && (
+        <nav aria-label="Product types">
+          <ul class="type-nav" role="list">
+            {groups.map((g) => (
+              <li>
+                <a href={`#${g.type}`}>
+                  {g.label} <span class="label">{g.items.length}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+  </PageHeader>
+
+  {
+    groups.map((g) => (
+      <section class="section container" id={g.type} aria-labelledby={`${g.type}-title`}>
+        <div class="section-head">
+          <h2 id={`${g.type}-title`}>{g.label}</h2>
+          <span class="label">{g.items.length}</span>
+        </div>
+        <ProductGrid products={g.items} />
+      </section>
+    ))
+  }
+</BaseLayout>
+
+<style>
+  .type-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .type-nav a {
+    display: inline-block;
+    padding-block: var(--space-2);
+  }
+</style>
