@@ -1,7 +1,26 @@
-# Design System — Key Light
+# Design System — Converge
 
-Direction: **Key Light** (see DesignDirections.md, Direction 1). Dark only.
-Code source of truth: `src/styles/tokens.css` (tokens) and `src/styles/global.css` (base styles, buttons, prose, helpers). If this doc and the code disagree, fix one of them in the same commit.
+Final design (chosen 2026-10-08): Concept 3 "Converge" from `Docs/Design/Exploration/Concepts.md`, with two small touches from Concept 5. These are the two-ink wordmark and the hard offset print shadow on primary buttons and product cards.
+
+Light only. Warm paper, black ink, one cobalt accent. Swiss: big confident headings, a numbered section rail, thin rules, spec tables. The home hero is a live path tracer.
+
+Code source of truth: `src/styles/tokens.css` (tokens) and `src/styles/global.css` (base styles, rail, spec table, buttons, prose, helpers). If this doc and the code disagree, fix one of them in the same commit.
+
+## Principles
+
+- **Plain and printed.** It should look set in type and printed, not generated. No soft glows, gradient blobs, glassmorphism, sparkle icons or stock marketing words.
+- **One accent.** Cobalt marks links, the primary action's shadow and focus. Everything else is ink on paper.
+- **Square corners.** Rules and borders carry the structure. There are no radii anywhere.
+- **Few tactile details:**
+  - the wordmark's misregistered second ink;
+  - the hard offset shadow on primary buttons, product cards and the featured card;
+  - paper grain;
+  - crop marks around the hero plate;
+  - the dashed "Coming soon" buttons;
+  - the four-square status gauge.
+
+  Nothing else gets them.
+- **Copy:** first person singular, short sentences, plain words.
 
 ## Tokens
 
@@ -9,69 +28,61 @@ Code source of truth: `src/styles/tokens.css` (tokens) and `src/styles/global.cs
 
 | Token | Value | Use | Contrast |
 |---|---|---|---|
-| `--color-void` | `#0b0c0e` | Page background | — |
-| `--color-surface` | `#121418` | Cards, footer, spec sheet | — |
-| `--color-raised` | `#1a1d22` | Media fallback, secondary button | — |
-| `--color-line` | `#2a2e35` | Hairlines | Decorative |
-| `--color-line-strong` | `#3a3f48` | Control borders, disabled store button | Decorative |
-| `--color-text` | `#edeae4` | Body, headings | 16.3:1 on void |
-| `--color-text-muted` | `#a39f98` | Labels, captions | 7.4:1 on void, 6.4:1 on raised |
-| `--color-key` | `#f2b66d` | Links, primary fill, focus ring | 10.9:1 on void |
-| `--color-on-key` | `#0b0c0e` | Text on key fill | 10.9:1 |
-| `--color-fill` | `#4a5d7a` | Cool fill light in gradients | Decorative |
+| `--color-paper` | `#e7e5e0` | Page background. Also the path tracer's cove colour. | — |
+| `--color-paper-2` | `#dcd9d2` | Image plates, placeholders, tiles | ink 13.4:1, ink-2 6.3:1, blue 6.4:1 |
+| `--color-card` | `#f2f1ed` | Product cards, featured card | ink 16.7:1, ink-2 7.9:1, blue 8.0:1 |
+| `--color-ink` | `#111111` | Text, rules, borders, footer background | 15.0:1 on paper |
+| `--color-ink-2` | `#4a4a48` | Secondary text, disabled store buttons | 7.1:1 on paper |
+| `--color-blue` | `#1d31c9` | Links, focus ring, print shadow, wordmark second ink | 7.1:1 on paper |
+| `--color-on-blue` | `#ffffff` | Text on cobalt (rare) | 9.0:1 |
+| `--color-blue-on-ink` | `#aab3ff` | Link hover and focus in the ink footer | 9.5:1 on ink |
+| `--color-hairline` | ink at 28% | Decorative hairlines only | — |
 
-Light tokens (decorative only): `--light-key` (key at 16% alpha), `--light-key-strong` (26%), `--light-fill` (fill at 22%), `--rim` and `--rim-strong` (135° border gradients, bright at the top left).
-
-**Rule:** text never sits on anything brighter than `--color-raised`. Over images, a vignette gradient guarantees a dark base under text.
+Paper text on the ink footer: 15.0:1.
 
 ### Type
 
-- Sans: **Archivo** variable (wght 100-900, wdth 62-125). Self-hosted, `font-display: swap`, preloaded.
-- Mono: **JetBrains Mono** variable (wght 100-800). Self-hosted, `font-display: swap`. Labels only.
-- Metric-matched fallbacks: `Archivo Fallback` (Arial) and `JetBrains Mono Fallback`.
+- Sans: **Space Grotesk** variable (300–700), self-hosted `src/assets/fonts/space-grotesk-variable-latin.woff2` (22 KB), preloaded.
+- Mono: **Space Mono** 400 and 700, self-hosted (17 KB each). Used for labels, buttons, the rail numbers and the spp counter.
+- Both OFL; licences sit next to the files. Total font weight is 55 KB.
 
 | Token | Value | Use |
 |---|---|---|
-| `--step--1` | 0.8125rem | Labels, captions, footer |
-| `--step-0` | 1 → 1.125rem fluid | Body |
-| `--step-1` | 1.25 → 1.5rem | Lede, h3 |
-| `--step-2` | 1.5 → 2rem | h2, card titles |
-| `--step-3` | 2 → 3rem | h1 |
-| `--step-4` | 2.375 → 4.5rem | `.display` (hero h1) |
+| `--step--1` | 0.8125rem | Labels, buttons, captions |
+| `--step-0` | 1 → 1.125rem | Body |
+| `--step-1` | 1.125 → 1.5rem | Lede, about text, feature rows |
+| `--step-2` | 1.5 → 2.25rem | Card titles, price, prose h2 |
+| `--step-3` | 2.25 → 5rem | Section h2 |
+| `--step-4` | 2.75 → 8.5rem | `.display` (page h1) |
+| `--step-num` | 3 → 6rem | Rail numbers |
 
-- Headings: weight 600-650, `font-stretch: 118%` (`--stretch-display`), tracking `-0.02em`, `text-wrap: balance`.
-- Body: weight 400, stretch 100%, line height 1.6, max measure 68ch.
-- `.label`: mono, `--step--1`, uppercase, tracking `0.06em`, muted.
+- Headings: weight 700, line height 0.95 (display 0.88), tracking −0.035em (display −0.045em), `text-wrap: balance`.
+- `.label`: Space Mono 700, `--step--1`, uppercase, tracking 0.04em.
+- Body: 400, line height 1.55, measure 62ch.
 
-### Space, layout, radii, shadow
+### Space, layout, rules, shadows
 
-- Space scale `--space-1`…`--space-10`: 4, 8, 12, 16, 24, 32, 48, 64, 96, 128px.
-- `--gutter`: clamp(16px, 4vw, 40px). `--max-width`: 76rem. `--measure`: 68ch.
-- Breakpoints (in media queries): 40rem (mobile nav), 48rem (21:9 heroes, 2-column studio), 64rem (product sidebar).
-- Radii: `--radius-s` 4px, `--radius-m` 8px, `--radius-l` 14px, `--radius-pill`.
-- Shadows: `--shadow-card` (soft drop under cards), `--shadow-hero` (featured frame).
+- Space scale `--space-1` … `--space-9`: 4, 8, 12, 16, 24, 32, 48, 64, 96 px.
+- `--gutter`: clamp(16px, 3.5vw, 48px). `--max-width`: 90rem.
+- Breakpoints (in media queries): 40rem (hero 16:9), 56rem (rail grid, hero text split, readout row), 64rem (hero 21:9, storefront two-column, featured card two-column).
+- `--rule`: 1px ink (table rows). `--rule-thick`: 3px ink (between page sections, under the header).
+- `--shadow-print`: `4px 4px 0` cobalt (primary buttons). Hover: `6px 6px 0` plus a −2px nudge.
+- `--shadow-card`: `6px 6px 0` ink (product cards; the featured card uses 8px). Hover: `8px 8px 0` cobalt plus a −2px nudge.
 
 ### Motion
 
-| Token | Value | Use |
-|---|---|---|
-| `--dur-fast` | 160ms | Colour and underline changes, arrow nudge |
-| `--dur-base` | 400ms | Light raising (card rim, glow) |
-| `--dur-slow` | 700ms | Reserved for slow fades |
-| `--ease-out` | cubic-bezier(0.16, 1, 0.3, 1) | Default |
-| `--ease-in-out` | cubic-bezier(0.65, 0, 0.35, 1) | Reserved |
-
-Only opacity, colour and box-shadow animate. Layout never moves. There is no on-load or scroll animation. `prefers-reduced-motion: reduce` sets every duration to 0ms.
+Only the hover nudge (transform), shadows and colours animate, over `--dur-fast` (140 ms, `--ease-out`). `prefers-reduced-motion: reduce` sets the duration to 0. There is no scroll or entrance animation.
 
 ### Focus
 
-`--focus-ring: 2px solid var(--color-key)`, `--focus-offset: 3px`, applied to `:focus-visible` everywhere. A card shows the ring on the whole card when its title link has focus.
+`--focus-ring: 3px solid` cobalt, offset 3px, on `:focus-visible` everywhere. In the ink footer the ring is `--color-blue-on-ink`. A product card shows the ring around the whole card when its title link has focus.
 
-## Signature motif
+## Signature elements
 
-- **Light pool** (`.light-field`): a warm radial key light at the top right plus a cool fill at the bottom left, behind page headers and the home hero. It is clipped horizontally.
-- **Specular rim**: a 1px gradient border (`--rim`) on cards, the featured frame and the spec sheet. On hover or focus a brighter rim and warm pool fade in (`--rim-strong`, opacity only).
-- **Blue-noise dither**: a 64×64 blue-noise PNG (`src/assets/blue-noise.png`, 3 KB, inlined) tiled on the body at about 3% white, which hides gradient banding.
+- **Path-traced hero** (`PathTracer.astro`): see below.
+- **Numbered rail** (`Section.astro`): every content section is a 12-column grid. A 3-column rail on the left holds a big mono number (`01`, `02` …) and a mono label. The 9-column body holds the h2 and content. A 3px ink rule closes the section. Below 56rem the rail stacks above the body. Numbers count only the sections present on the page.
+- **Two-ink wordmark** (`Wordmark.astro`): `site.name` as text in Space Grotesk 700, in ink. Each glyph has a cobalt `text-shadow` offset by about 0.06em, with a slightly different offset per glyph, like a hand-pulled print slightly out of register. In the footer the glyphs are paper-coloured. It works for any name.
+- **Paper grain**: a 64px blue-noise tile of dark specks (`src/assets/paper-grain.png`, 3 KB, at most 4% opacity) on the body.
 
 ## Components
 
@@ -79,20 +90,45 @@ All components live in `src/components/`.
 
 | Component | Spec |
 |---|---|
-| **Header** | Wordmark left, nav right (mono uppercase labels, 44px targets). `aria-current="page"` on an exact match, `"true"` on a section match, shown with a key-coloured underline. Below 40rem a "Menu" button (`aria-expanded`, `aria-controls`) toggles the nav; Escape closes it and returns focus. Without JS the button stays hidden and the nav is always visible. |
-| **Wordmark** | `site.name` as text. Archivo 125% width, weight 700. Non-alphanumeric characters (e.g. brackets) are drawn in key colour at weight 400. |
-| **Footer** | Surface background. Wordmark, tagline, social links, © year owner and a Privacy link. |
-| **SocialLinks** | YouTube, GitHub, Email from config. Empty values are hidden. Mono uppercase. |
-| **ProductCard** | Rim border, 16:9 media (decorative `alt=""`, because the title names it), type and platforms label, title (the link is stretched over the whole card), tagline, status badge. Hover or focus raises the light. |
-| **ProductGrid** | `auto-fill, minmax(20rem, 1fr)`: 1 column on mobile, up to 3 on desktop. |
-| **FeaturedProduct** | Mobile: 16:9 image above the text. ≥48rem: 21:9 frame with the text over a vignetted lower-left corner. Primary "View …" button plus status badge. |
-| **StatusBadge** | Mono pill with a small "lamp" dot whose brightness rises from concept (30%) to released (100%). |
-| **StoreButtons** | A vertical list. **Live**: key-filled, store name plus "Open store page ↗". **Coming soon** (empty string): `<span aria-disabled="true">`, dashed `--color-line-strong` border, transparent background, muted text (still AA), no pointer. Omitted keys are not shown. Plain text only, no official badges. |
-| **SpecSheet** | Rim card. A `dl` of Status, Type, Platforms and Release (if set), then store buttons, then a privacy link if the product has one. Sticky in the sidebar at ≥64rem. |
-| **FeatureList** | `ol` with mono key-coloured indices (01, 02…) and hairline separators. |
-| **Gallery** | `auto-fill, minmax(16rem, 1fr)` grid of 16:9 thumbnails. Each links to the full image and has a `01 / 03` caption. The border turns key colour on hover. |
-| **Trailer** | A poster (hero image, 60% opacity) with a key-filled "Play the … trailer" pill. It is a real link to youtube.com, so it works without JS. With JS a click swaps in a `youtube-nocookie.com` iframe with autoplay. No request goes to YouTube before the click. The note under it says so. |
-| **SystemRequirements** | Table: row headers in mono, Minimum and Recommended columns, horizontal scroll on narrow screens. |
-| **PageHeader** | Light-field header with an optional label, h1 and lede. |
-| **Buttons** (`.button`, `.button--primary`) | 44px minimum height, radius m. Primary = key fill. Secondary = raised fill with a strong line border. Hover adds a key glow. |
-| **Links** | Key colour with a 45%-alpha underline that turns solid on hover. |
+| **Header** | Wordmark left (1.75rem). Nav right: Products, About, and Portfolio ↗ when `site.portfolioUrl` is set. Mono uppercase, 44px targets, no JavaScript and no menu toggle (three items fit at 360px). Current page: 3px cobalt underline. A 3px ink rule below. |
+| **Footer** | Ink background. Big display links: Portfolio, YouTube, GitHub, Email; empty ones are hidden. Then a meta row: paper wordmark + tagline, Privacy, © year owner. |
+| **SocialLinks** | `inline` (mono labels) or `big` (footer). External links get ↗ and `rel="me noopener"`. |
+| **Section** | The numbered rail (see above). Props: `n`, `label`, `title`, `id`. |
+| **PageHeader** | Mono kicker, display h1, optional lede and slot, with a 3px rule below. Used by Products, About, Privacy and product privacy pages. |
+| **PathTracer** | The hero plate, readout and strip. See "Path-traced hero". |
+| **FeaturedProduct** | Large card: 2px ink border, `--color-card`, 8px ink offset shadow. ≥64rem: media (7 of 12 columns, full height, cover) beside the body. Body: tagline, short spec table (Type, Platforms, Price, Status), store buttons in a row, and a primary "View <title> →" button. |
+| **ProductCard** | 2px ink border, `--color-card`, 6px ink offset shadow. Hover or focus: −2px nudge and an 8px cobalt shadow. Contents: 16:9 media (decorative `alt=""`), mono type · platforms label, title (the link is stretched over the card), tagline, and a footer row with the price and status. |
+| **ProductGrid** | `auto-fill, minmax(19rem, 1fr)`, 2rem gap, extra right and bottom padding for the shadows. |
+| **StoreButtons** | Order: primary live store (`.button--primary`), other live stores (`.button`), planned stores (dashed, ink-2, "<Store> Coming soon" as plain text, not a link, not focusable). Live labels come from the store and status, e.g. "Wishlist on Steam" (pre-release), "Buy on Steam" (paid), "Get it on Google Play" (free). `stack` layout (buy box) adds a one-line note when any store is planned. |
+| **StatusBadge** | Mono uppercase label after a four-square gauge filled to the stage: concept 1, in development 2, early access 3, released 4 (cobalt). |
+| **SpecTable** | `.spec-table`: mono uppercase row headers, 1px ink rules. Rows: Type, Platforms, Price, Status, plus Release and Privacy in `full` mode. |
+| **FeatureList** | `ol`; each row has a cobalt mono index (01, 02 …), `--step-1` text and a 1px rule. |
+| **Gallery** | `auto-fill, minmax(16rem, 1fr)` grid of 16:9 thumbnails with 2px ink borders, each linking to the full image, with a `01 / 03` mono caption. |
+| **Trailer** | 16:9 poster with 2px ink border and a primary "Play the … trailer" button. It is a real youtube.com link; with JS a click swaps in a youtube-nocookie iframe. Nothing loads from YouTube before the click. |
+| **SystemRequirements** | `.spec-table` with Minimum and Recommended columns; scrolls sideways on narrow screens. |
+| **Buttons** | `.button`: square, 2px ink border, mono uppercase `--step--1`, 44px tall. Hover inverts to an ink fill. `.button--primary`: ink fill, paper text, cobalt print shadow. |
+| **Links** | Cobalt, 2px underline. Hover turns ink. |
+
+## Path-traced hero
+
+- **Renderer:**
+  - Code: `src/scripts/path-tracer.ts` (WebGL2) and `src/scripts/path-tracer-hero.ts` (DOM wiring).
+  - Scene: a white studio cove (floor, curved fillet, wall) with a matte cobalt, glass, chrome, black and white sphere under one spherical light.
+  - Method: unidirectional path tracing with next-event estimation, up to 6 bounces and Russian roulette. A running average lives in a ping-pong RGBA32F (or RGBA16F) target, then ACES tone mapping.
+  - Colour: the result is scaled so the cove equals `--color-paper`, and the plate's top and bottom fade into the page with a mask.
+- **Plate:** 4:5 below 40rem, 16:9 to 64rem, 21:9 above. Crop marks sit in the four corners.
+- **Readout:** a giant mono spp counter, a one-paragraph caption, Pause and Restart buttons, and a three-tile strip (1, 16 and 1024 spp).
+- **Behaviour:**
+  - **Before it runs,** and when it can't run (no WebGL2, no float targets, lost context), the plate shows a still frame rendered offline by the same code. The strip shows the matching 1, 16 and 1024 spp frames, so no tile is ever empty.
+  - **Reduced motion:** the still frame stays. A "Render it live" button lets the visitor opt in.
+  - **Start:** after first paint (`requestAnimationFrame`, then idle). The still hides, and the canvas renders one sample per pixel per frame.
+  - **Budget:** device pixel ratio capped at 2, pixel budget 0.55 MP.
+  - **Pausing:** pauses when the tab is hidden or the plate is off-screen.
+  - **Stop:** at 1024 spp it stops completely; nothing runs until the light moves.
+  - **Strip:** live frames are copied into the tiles at 1, 16 and 1024 spp. Moving the light resets them to the stills.
+  - **Input:** click or drag (or arrow keys on the focused canvas) moves the light and restarts.
+- **Fallback images:** `src/assets/hero/{wide-1024,tall-1024,strip-1,strip-16}.jpg`, served as responsive WebP. Regenerate them with `node scripts/render-hero-images.mjs` (Docs/HowTo/RenderHeroImages.md). The same script writes `public/og-default.jpg`.
+
+## Placeholder art
+
+Placeholders are SVG line drawings in ink with a cobalt line on `--color-paper-2`, labelled "PLACEHOLDER …" in a black box. Hero labels are centred so they survive the 16:9 and square crops. Alt text always says it is not a screenshot.

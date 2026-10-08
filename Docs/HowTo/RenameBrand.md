@@ -5,7 +5,7 @@ The studio name `[LKY]` is temporary. Renaming it is a one-file edit.
 ## Steps
 
 1. Open `src/config/site.ts`.
-2. Change `name`. Also update `tagline`, `intro`, `email`, `socials`, `defaultSocialImageAlt` and `owner` if they change.
+2. Change `name`. Also update `headline`, `tagline`, `email`, `portfolioUrl`, `socials`, `defaultSocialImageAlt` and `owner` if they change.
 3. Run `npm run check && npm run build`.
 4. Check that the old name is gone (it should print nothing):
    ```sh
@@ -15,14 +15,14 @@ The studio name `[LKY]` is temporary. Renaming it is a one-file edit.
 
 ## What updates automatically
 
-The header and footer wordmark, every `<title>`, `og:site_name`, `og:title`, the Twitter tags, the JSON-LD author and publisher, the About page, the site and product privacy pages, the products index description and the home studio section.
+The header and footer wordmark, every `<title>`, `og:site_name`, `og:title`, the Twitter tags, the JSON-LD author and publisher, the About page, the site and product privacy pages, the products index description and the home sections.
 
-The wordmark styling works for any name: letters and digits are bright, and punctuation (such as brackets) is drawn in the key colour.
+The two-ink wordmark works for any name: every glyph is drawn in ink over a slightly offset cobalt impression.
 
 ## Images
 
-- `public/favicon.svg`, `public/apple-touch-icon.png` and `public/og-default.png` contain **no text**, so they don't need regenerating.
-- Only if you want a branded social card: replace `public/og-default.png` with a 1200×630 PNG, then update `defaultSocialImage` and `defaultSocialImageAlt` in `site.ts`.
+- `public/og-default.jpg` is a path-traced render with **no text**. It doesn't need changing.
+- `public/favicon.svg` and `public/apple-touch-icon.png` are two drawn square brackets (shapes, not text) in the two inks. If the new name has no brackets, redraw them; both are tiny and documented in `public/favicon.svg`.
 
 ## Where the old name may still appear
 
@@ -31,9 +31,10 @@ The wordmark styling works for any name: letters and digits are bright, and punc
 
 ## Rules that keep this working
 
-- Never type the studio name, owner name, email or social URLs anywhere except `src/config/site.ts`.
+- Never type the studio name, owner name, email, portfolio or social URLs anywhere except `src/config/site.ts`.
 - Product Markdown must not mention the studio name.
 
 ## Verified
 
-Stage 2 brand-swap test (2026-10-07): renamed to "Halcyon Works" and built. The old name appeared 0 times in `dist/`, `src/`, `public/` or `.github/`, and the new name appeared on all 6 pages. Then reverted.
+- Stage 2 (2026-10-07): renamed to "Halcyon Works" and built. The old name appeared 0 times in `dist/`, `src/`, `public/` or `.github/`, and the new name appeared on all 6 pages. Reverted.
+- Final design (2026-10-08): repeated with the same result. See SessionLog.

@@ -1,3 +1,5 @@
+> **Amended 2026-10-08 (final design and positioning).** Charitha's later instructions override parts of this brief; see ClaudeMemory/Decisions.md. In short: the site is a **product showcase** that sends people to the right store; background, projects and research live on a separate **portfolio site**, which this site only links to. The design is final: "Converge" (Docs/Design/DesignSystem.md). Amended passages are marked [Amended 2026-10-08]; the rest is the original text.
+
 You are the designer and lead engineer for the official website of my one-person indie studio. This message is the MASTER BRIEF for the whole project. The project runs in stages across separate sessions. In THIS session you do Stage 1 only: design, architecture and documentation. Do not write site code in this session.
 
 === 0. FIRST ACTION ===
@@ -16,20 +18,24 @@ Save this entire message verbatim as Docs/00-ProjectBrief.md and commit it. It i
 - Personality: abstract, technical, calm, crafted. A small studio that cares about graphics and immersive experiences. Not corporate, not cartoonish.
 
 === 3. WHAT THE SITE IS FOR ===
-A small studio site, like many indie developers have: it lists everything I make (games, VR apps, tools, experiences) and gives each one its own permanent page. I will put those page URLs into store listings (Steam, Meta Horizon Store, Google Play), and each page links out to the stores where the product is available.
+[Amended 2026-10-08] A product showcase, not a portfolio and not a research site. It presents things people can get for free or buy (games, VR apps, tools, experiences), gives each one its own permanent page, and sends people to the right store (Steam, Meta Horizon Store, Google Play, itch.io and so on). Store listings link back to those pages. My background, projects and research live on my separate portfolio site; this site only links to it. It does not rank my interests anywhere.
+
+Original text: A small studio site, like many indie developers have: it lists everything I make (games, VR apps, tools, experiences) and gives each one its own permanent page. I will put those page URLs into store listings (Steam, Meta Horizon Store, Google Play), and each page links out to the stores where the product is available.
 
 === 4. PAGES ===
 - Home: brand hero with tagline, featured product, grid of all published products, short studio intro, links (YouTube, email, GitHub).
-- Products index (/products/): every published product, grouped or filterable by type.
-- Product page (/products/<slug>/): hero media, tagline, description, key features, screenshots, trailer (YouTube embed, loaded only on click), platforms, status, store buttons, system requirements when relevant.
+  [Amended 2026-10-08] Hero = live path tracer + headline + one line; 01 Featured product (price and store buttons); 02 Products; 03 About (two or three sentences; links to portfolio, YouTube, GitHub).
+- Products index (/products/): every published product, grouped or filterable by type. [Amended 2026-10-08] Grouped by platform, no JavaScript.
+- Product page (/products/<slug>/): hero media, tagline, description, key features, screenshots, trailer (YouTube embed, loaded only on click), platforms, status, store buttons, system requirements when relevant. [Amended 2026-10-08] It is the storefront: price or "Free", store buttons with the primary action first, spec table, privacy policy link when present.
 - Product privacy policy (/products/<slug>/privacy/): optional per product, written in Markdown. Google Play and Meta require a privacy policy URL, so this must exist as a pattern.
-- About: the studio and me.
+- About: the studio and me. [Amended 2026-10-08] Short; links to the portfolio for everything else.
 - Privacy: privacy policy for the website itself (no tracking, no cookies by default).
 - 404 page.
 Product slugs are PERMANENT once published because store listings link to them.
 
 === 5. CONTENT MODEL (proposal; refine it in the architecture docs) ===
 One Markdown file per product, validated by a schema. Fields: title, slug, type (game | app | tool | experience), tagline, summary, status (concept | in-development | early-access | released), platforms (e.g. Windows PC VR, Meta Quest, Android, Windows, Web), featured (bool), draft (bool, drafts never build), releaseDate (optional), heroImage, screenshots, trailerYouTubeId, storeLinks (steam, metaHorizon, googlePlay, itch, github, website: each optional), systemRequirements (optional), hasPrivacyPolicy (bool), order. Body = long description.
+[Amended 2026-10-08] Also price (string) and pricingModel (free | paid | free-with-in-app-purchases | tba); a missing price or tba shows "Price TBA". Planned stores are listed in plannedStores; storeLinks hold live URLs only. Final schema: Docs/Architecture/ContentModel.md.
 Store buttons: an empty link shows a disabled "Coming soon" state. Use plain styled text buttons with the store's name; do NOT use official store badge images yet (they have brand guidelines — list them as a later task in the roadmap).
 
 === 6. FIRST PRODUCT: ROTUNDA ===
@@ -53,6 +59,7 @@ Also create one sample product with draft: true as a template for future entries
 - Ask me before adding any dependency not implied above.
 
 === 8. DESIGN DIRECTION ===
+[Amended 2026-10-08] Final design: "Converge" — light warm paper, black ink, one cobalt accent, Swiss grid with a numbered rail, a live path-traced hero, a two-ink wordmark and hard offset print shadows. Copy is plain, first person, short sentences. Spec: Docs/Design/DesignSystem.md. The original direction below is kept for history.
 I work in real-time graphics and XR, so the site should feel like it comes from someone who cares about light, depth and motion — restrained and high quality, not flashy. Avoid generic template looks (default SaaS hero, stock gradients, emoji icons). You have creative freedom within these constraints: it must stay fast, readable and accessible, and the brand name must be swappable. Dark-first is welcome but not required.
 
 === 9. DOCUMENTATION AND CLAUDE MEMORY SYSTEM ===
