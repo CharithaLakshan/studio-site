@@ -5,7 +5,7 @@
 - **Astro 7** (static output), **TypeScript 6** strict (`astro/tsconfigs/strict`), npm.
 - Integrations: `@astrojs/sitemap`. Dev: `@astrojs/check`.
 - Plain CSS with custom-property tokens. No CSS or UI framework. All CSS (about 19 KB, 5 KB gzipped) is inlined into each page (`build.inlineStylesheets: 'always'`), so no stylesheet blocks rendering.
-- Client JS: two small vanilla module scripts. The home hero path tracer (WebGL2, about 14 KB minified with its GLSL) and the trailer click-to-load. Everything else is HTML and CSS; the header needs no script.
+- Client JS: two small vanilla module scripts. The home hero (a 5 KB wiring script; the 10 KB WebGL2 path tracer is a separate chunk loaded with `import()` only when the visitor starts a live render) and the trailer click-to-load. Everything else is HTML and CSS; the header needs no script.
 - Images: `astro:assets` (`<Image>`, `getImage`, sharp). Raster images get WebP `srcset`s; SVGs pass through unchanged.
 - Hosting: GitHub Pages through GitHub Actions. No backend, CMS, database, analytics or cookies.
 
@@ -15,7 +15,7 @@
 .github/workflows/deploy.yml   Build (check + build) and deploy to Pages on push to main
 astro.config.ts                site + base read from src/config/site.ts; sitemap; trailingSlash 'always'
 public/                        Copied as-is: favicon.svg, apple-touch-icon.png, og-default.jpg (a crop of the path-traced hero)
-scripts/render-hero-images.mjs Re-renders the hero fallback images and og-default.jpg (Playwright; see Docs/HowTo/RenderHeroImages.md)
+scripts/render-hero-images.mjs Re-renders the hero poster, stage images, thumbnails and og-default.jpg (Playwright; see Docs/HowTo/RenderHeroImages.md)
 src/
   config/site.ts               THE brand file: name, headline, tagline, owner, email, portfolioUrl, socials, url, base, default social image
   content.config.ts            Collections + Zod schemas (products, productPrivacy); PLATFORMS, PRODUCT_TYPES, STATUSES, PRICING_MODELS, STORE_KEYS
@@ -24,14 +24,14 @@ src/
     product-privacy/<slug>.md  Optional per-product privacy policy
   assets/
     fonts/                     Space Grotesk (variable) + Space Mono 400/700 WOFF2 and OFL licences
-    hero/                      Path tracer stills: wide-1024 (2400×733, STILL framing), tall-1024 (4:5), strip-1/16/1024 (800×450)
+    hero/                      Hero pictures at 12:5: poster-1024 (2880×1200), stage-1/16 (1320×550), thumb-1/16/1024 (240×100)
     products/<slug>/           Hero, screenshots (placeholders are placeholder-*.svg)
     paper-grain.png            Paper grain tile, inlined into CSS
   styles/tokens.css            @font-face + design tokens
   styles/global.css            Reset, type, links, focus, rail grid, spec table, prose, buttons, helpers
   scripts/
     path-tracer.ts             PathTracer class: WebGL2 progressive path tracer (shaders, ping-pong float targets)
-    path-tracer-hero.ts        mountPathTracer(): still/live switching, reduced motion, pausing, input, strip captures
+    path-tracer-hero.ts        mountHero(): poster/stage/live switching, buttons and thumbnails, lazy import, pausing, input
   layouts/BaseLayout.astro     <head> SEO (title, description, canonical, OG, Twitter, JSON-LD), header, main, footer
   components/                  Header, Footer, Wordmark, SocialLinks, Section (numbered rail), PageHeader, PathTracer,
                                ProductCard, ProductGrid, FeaturedProduct, SpecTable, StatusBadge, StoreButtons,
@@ -84,7 +84,7 @@ Everything that names the studio or the owner reads from `site.ts`: the wordmark
 
 ## Path tracer
 
-The hero renderer is plain TypeScript with no dependency. `PathTracer.create(canvas)` returns `null` when WebGL2 or float render targets are missing, and the hero then keeps its still frame. The same class renders the fallback stills offline (`scripts/render-hero-images.mjs` bundles it with esbuild and runs it in headless Chromium), so the still and the live render always match. Behaviour rules: Docs/Design/DesignSystem.md, "Path-traced hero".
+The hero renderer is plain TypeScript with no dependency. `PathTracer.create(canvas)` returns `null` when WebGL2 or float render targets are missing, and the hero then keeps its poster. The same class renders the poster and stage images offline (`scripts/render-hero-images.mjs` bundles it with esbuild and runs it in headless Chromium), so the pictures and the live render always match (one 12:5 `FRAME`). Behaviour rules: Docs/Design/DesignSystem.md, "Path-traced hero".
 
 ## Guarantees and checks
 

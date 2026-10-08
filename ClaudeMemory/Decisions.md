@@ -167,3 +167,12 @@ Newest last. Format: date — decision. Options considered. Reason.
 - **Store buttons are full width in both layouts.**
   - Decision: the `row` layout wraps at 15rem per button.
   - Reason: the featured card's text column is narrow at every width, and the old inline buttons broke into fragments.
+
+## 2026-10-08 — Hero: full-bleed render with poster (option C)
+
+- **Decision:** the home hero is a full-bleed path-traced render that fills the first screen (`100svh` minus the header) with the headline and tagline on top and a bar along the bottom (counter + status, 1/16/1024 spp thumbnails, buttons). It opens on a pre-rendered 1024 spp poster (the LCP image). The path tracer is a lazy `import()` chunk and creates its WebGL context only when the visitor starts a live render. Phones and portrait screens stack: text, render at 4:3, bar.
+- **One framing:** poster, stage images and live canvas all use one fixed 12:5 view (`FRAME`) and `object-fit: cover` at 50% 50%, so swaps never shift the scene. The spheres sit in `BAND` (43% wide, 32–76% tall); the rest is empty studio, so cover crops only trim backdrop. The hero never gets wider than 12:5 (taller hero on very wide screens) so the crop only trims the sides.
+- **Replaces:** `viewFor()`/`STILL` (per-aspect camera, CSS-scaled still), the phone `tall` still, the strip with live captures, auto-start after first paint, and `softwareWebGL()` (no longer needed: nothing runs unasked, so Lighthouse and GPU-less visitors get the poster).
+- **Live canvas:** sized to the picture's shown width (dpr ≤ 2), capped at 1320×550 (0.73 MP, up from 0.55 MP because the frame is fixed and nothing runs until asked). The 1/16 spp stage images are rendered at that same size so their noise matches.
+- **Breakpoint:** the overlay layout needs `min-width: 47.5rem` and a landscape viewport (`min-aspect-ratio: 4/3`); 768×1024 therefore uses the stacked layout.
+- **Reason:** Charitha's hero review, option C: open on a finished image, render live only on request, no jumps, no cropped spheres.

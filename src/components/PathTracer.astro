@@ -1,51 +1,75 @@
 ---
 /**
- * The home hero image: a progressive path tracer (src/scripts/path-tracer.ts).
- * Before it runs, and whenever it can't, a still frame rendered by the same code is shown
- * (src/assets/hero/, regenerated with scripts/render-hero-images.mjs).
+ * The home hero: a full-bleed path-traced render with the headline on top (slot) and a bar along
+ * the bottom (spp counter and status, three stage thumbnails, buttons).
+ *
+ * The page opens on a pre-rendered 1024 spp poster (the LCP image). The live path tracer
+ * (src/scripts/path-tracer.ts) is only loaded when the visitor asks for it. The poster, the stage
+ * images and the live canvas share one 12:5 framing (FRAME) and one object-fit, so they line up
+ * exactly. Pictures: src/assets/hero/, regenerated with scripts/render-hero-images.mjs.
  */
 import { getImage } from 'astro:assets';
-import { STILL } from '../scripts/path-tracer';
-import strip1 from '../assets/hero/strip-1.jpg';
-import strip16 from '../assets/hero/strip-16.jpg';
-import strip1024 from '../assets/hero/strip-1024.jpg';
-import wide1024 from '../assets/hero/wide-1024.jpg';
-import tall1024 from '../assets/hero/tall-1024.jpg';
+import poster1024 from '../assets/hero/poster-1024.jpg';
+import stage1 from '../assets/hero/stage-1.jpg';
+import stage16 from '../assets/hero/stage-16.jpg';
+import thumb1 from '../assets/hero/thumb-1.jpg';
+import thumb16 from '../assets/hero/thumb-16.jpg';
+import thumb1024 from '../assets/hero/thumb-1024.jpg';
 
 const alt =
   'A path-traced render in a white studio: a matte cobalt sphere, a glass sphere, a chrome sphere, a small black sphere and a small white sphere, lit by one soft light.';
-const wide = await getImage({ src: wide1024, widths: [960, 1600, 2400], format: 'webp' });
-// The wide still is scaled like the live camera frames the scene (see STILL in path-tracer.ts).
-const stillVars = `--still-kh: ${STILL.kh.toFixed(4)}; --still-kw: ${STILL.kw.toFixed(4)};`;
-const tall = await getImage({ src: tall1024, widths: [432, 864], format: 'webp' });
-const strip = await Promise.all(
+const poster = await getImage({ src: poster1024, widths: [960, 1440, 1920, 2400, 2880], format: 'webp' });
+// Shown size of the 12:5 poster under object-fit: cover. Phones and portrait screens: a 4:3 frame,
+// 100vw wide, so the picture is 180vw wide. Otherwise the hero is one screen minus the header tall.
+const posterSizes =
+  '(max-width: 47.49rem) 180vw, (max-aspect-ratio: 4/3) 180vw, (min-aspect-ratio: 12/5) 100vw, calc(240vh - 10rem)';
+const stages = await Promise.all(
   [
-    { src: strip1, caption: '1 spp' },
-    { src: strip16, caption: '16 spp' },
-    { src: strip1024, caption: '1024 spp' },
-  ].map(async ({ src, caption }) => ({
-    caption,
-    img: await getImage({ src, widths: [320, 480, 640], format: 'webp', quality: 70 }),
-  })),
+    { n: 1, src: stage1 },
+    { n: 16, src: stage16 },
+  ].map(async ({ n, src }) => ({ n, img: await getImage({ src, width: src.width, format: 'webp', quality: 80 }) })),
 );
+const thumbs = await Promise.all(
+  [
+    { n: 1, src: thumb1 },
+    { n: 16, src: thumb16 },
+    { n: 1024, src: thumb1024 },
+  ].map(async ({ n, src }) => ({ n, img: await getImage({ src, widths: [120, 240], format: 'webp', quality: 80 }) })),
+);
+const samples = (n: number) => `${n} ${n === 1 ? 'sample' : 'samples'} per pixel`;
 ---
 
-<figure class="pt" data-pt aria-labelledby="pt-note">
+<section class="pt" data-pt aria-labelledby="hero-title">
+  <div class="container pt-text">
+    <slot />
+  </div>
+
   <div class="pt-stage" data-pt-stage>
-    <picture class="pt-still" style={stillVars}>
-      <source media="(max-width: 39.99rem)" srcset={tall.srcSet.attribute} sizes="100vw" type="image/webp" />
-      <img
-        src={wide.src}
-        srcset={wide.srcSet.attribute}
-        sizes="140vw"
-        alt={alt}
-        width={wide1024.width}
-        height={wide1024.height}
-        decoding="async"
-        fetchpriority="high"
-      />
-    </picture>
-    <canvas class="pt-canvas" data-pt-canvas role="img" aria-label={`${alt} Rendering live.`} aria-describedby="pt-note" hidden></canvas>
+    <img
+      class="pt-pic"
+      src={poster.src}
+      srcset={poster.srcSet.attribute}
+      sizes={posterSizes}
+      alt={alt}
+      width={poster1024.width}
+      height={poster1024.height}
+      loading="eager"
+      fetchpriority="high"
+    />
+    {
+      stages.map(({ n, img }) => (
+        <img
+          class="pt-pic"
+          data-pt-stage-img={n}
+          data-src={img.src}
+          alt={`${alt} Shown at ${samples(n)}, still noisy.`}
+          width={stage1.width}
+          height={stage1.height}
+          hidden
+        />
+      ))
+    }
+    <canvas class="pt-pic pt-canvas" data-pt-canvas role="img" aria-label={`${alt} Rendering live.`} hidden></canvas>
     <span class="pt-focus" aria-hidden="true"></span>
     <span class="crop crop--tl" aria-hidden="true"></span>
     <span class="crop crop--tr" aria-hidden="true"></span>
@@ -53,116 +77,75 @@ const strip = await Promise.all(
     <span class="crop crop--br" aria-hidden="true"></span>
   </div>
 
-  <div class="container pt-readout">
-    <p class="pt-spp" aria-hidden="true"><span data-pt-spp>1024</span><small>spp</small></p>
-    <p class="pt-note" id="pt-note" data-pt-note>
-      This image is path-traced: each pixel averages 1024 random light paths. With JavaScript and WebGL2 on,
-      it renders live in your browser.
-    </p>
-    <div class="pt-controls">
-      <button class="button" type="button" data-pt-pause hidden>Pause</button>
-      <button class="button" type="button" data-pt-restart hidden>Restart</button>
-      <button class="button" type="button" data-pt-play hidden>Render it live</button>
+  <div class="pt-bar">
+    <div class="container pt-bar-inner">
+      <div class="pt-readout">
+        <p class="pt-spp" aria-hidden="true"><span data-pt-spp>1024</span><small>spp</small></p>
+        <p class="pt-status" data-pt-status>Pre-rendered at {samples(1024)}.</p>
+      </div>
+      <ul class="pt-thumbs pt-js" aria-label="Stages of the render">
+        {
+          thumbs.map(({ n, img }) => (
+            <li>
+              <button class="pt-thumb" type="button" data-pt-thumb={n} aria-pressed={n === 1024 ? 'true' : 'false'}>
+                <img src={img.src} srcset={img.srcSet.attribute} sizes="7.5rem" alt="" width="240" height="100" decoding="async" />
+                <span class="label">
+                  <span class="visually-hidden">Show the frame at </span>
+                  {n} spp
+                </span>
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="pt-controls pt-js">
+        <button class="button button--primary" type="button" data-pt-play>Render live</button>
+        <button class="button" type="button" data-pt-restart hidden>Restart</button>
+      </div>
     </div>
-    <ol class="pt-strip" aria-label="The same image at 1, 16 and 1024 samples per pixel">
-      {
-        strip.map(({ caption, img }) => (
-          <li>
-            <figure>
-              <div class="pt-tile">
-                <img
-                  src={img.src}
-                  srcset={img.srcSet.attribute}
-                  sizes="(min-width: 56rem) 30vw, 33vw"
-                  alt=""
-                  width="640"
-                  height="360"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <canvas data-pt-tile width="640" height="360" aria-hidden="true" hidden />
-              </div>
-              <figcaption class="label">{caption}</figcaption>
-            </figure>
-          </li>
-        ))
-      }
-    </ol>
   </div>
-</figure>
+</section>
 
 <script>
-  import { mountPathTracer } from '../scripts/path-tracer-hero';
-  for (const el of document.querySelectorAll<HTMLElement>('[data-pt]')) mountPathTracer(el);
+  import { mountHero } from '../scripts/path-tracer-hero';
+  for (const el of document.querySelectorAll<HTMLElement>('[data-pt]')) mountHero(el);
 </script>
 
 <style>
   .pt {
+    position: relative;
+    isolation: isolate;
+    display: grid;
     border-bottom: var(--rule-thick);
   }
 
-  /*
-   * Landscape screens from 40rem: the parent .hero (src/pages/index.astro) sizes the stage row to
-   * the space left under the headline, so the whole render fits on the first screen. The figure
-   * takes that row and the next one (the readout) through subgrid.
-   */
-  @supports (grid-template-rows: subgrid) {
-    @media (min-width: 40rem) and (min-aspect-ratio: 1/1) {
-      :global(.hero) > .pt {
-        grid-row: 2 / 4;
-        grid-column: 1;
-        display: grid;
-        grid-template-rows: subgrid;
-      }
-
-      .pt-stage.pt-stage {
-        aspect-ratio: auto;
-      }
-    }
-  }
-
+  /* Phones and portrait screens: headline, the render at 4:3, then the bar in normal flow. */
   .pt-stage {
     position: relative;
-    aspect-ratio: 4 / 5;
-  }
-
-  .pt-still,
-  .pt-still img,
-  .pt-canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* The render's white cove is tone-mapped to the page colour; soft edges let it melt into the page. */
-  .pt-still img {
-    object-fit: cover;
-  }
-
-  .pt-still,
-  .pt-canvas {
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 88%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 88%, transparent);
-  }
-
-  .pt-still {
-    overflow: hidden;
-  }
-
-  .pt-canvas {
+    aspect-ratio: 4 / 3;
     cursor: crosshair;
     touch-action: pan-y;
   }
 
-  /* The mask and the screen edges would hide the canvas's own outline, so focus draws a frame between the crop marks. */
+  /* Poster, stage images and canvas: one 12:5 framing, one fit, so swapping them never shifts the scene. */
+  .pt-pic {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 50%;
+  }
+
   .pt-canvas:focus-visible {
     outline: none;
   }
 
+  /* The screen edges would hide the canvas's own outline, so focus draws a frame between the crop marks. */
   .pt-focus {
     display: none;
     position: absolute;
+    z-index: 2;
     inset: var(--space-3) var(--gutter);
     outline: var(--focus-ring);
     pointer-events: none;
@@ -172,13 +155,10 @@ const strip = await Promise.all(
     display: block;
   }
 
-  .is-live .pt-still {
-    visibility: hidden;
-  }
-
   /* Crop marks: a small printed detail at the corners of the plate. */
   .crop {
     position: absolute;
+    z-index: 2;
     width: 1.25rem;
     height: 1.25rem;
     border: 0 solid var(--color-ink);
@@ -190,16 +170,38 @@ const strip = await Promise.all(
   .crop--bl { bottom: var(--space-3); left: var(--gutter); border-bottom-width: 1.5px; border-left-width: 1.5px; }
   .crop--br { bottom: var(--space-3); right: var(--gutter); border-bottom-width: 1.5px; border-right-width: 1.5px; }
 
-  .pt-readout {
+  .pt-text {
     display: grid;
+    gap: var(--space-5);
+    padding-block: clamp(2rem, 5vw, 4rem) var(--space-5);
+  }
+
+  .pt-text :global(.lede) {
+    max-width: 30ch;
+  }
+
+  .pt-bar-inner {
+    display: grid;
+    grid-template-areas: 'thumbs' 'readout' 'controls';
     gap: var(--space-4) var(--space-6);
     align-items: end;
-    padding-block: var(--space-5) var(--space-7);
+    padding-block: var(--space-4) var(--space-6);
+  }
+
+  /* Thumbnails and buttons need the script; without it they keep their space but stay invisible. */
+  .pt:not(.is-ready) .pt-js {
+    visibility: hidden;
+  }
+
+  .pt-readout {
+    grid-area: readout;
+    display: grid;
+    gap: var(--space-2);
   }
 
   .pt-spp {
     font-family: var(--font-mono);
-    font-size: clamp(3.5rem, 2rem + 6vw, 7rem);
+    font-size: clamp(2.25rem, 1.5rem + 2.5vw, 3rem);
     font-weight: 700;
     line-height: 0.85;
     letter-spacing: -0.06em;
@@ -207,81 +209,145 @@ const strip = await Promise.all(
   }
 
   .pt-spp small {
-    font-size: 0.22em;
+    font-size: 0.3em;
     letter-spacing: 0;
     vertical-align: top;
     margin-left: 0.4em;
   }
 
-  .pt-note {
-    max-width: 52ch;
-    font-size: 0.9375rem;
+  .pt-status {
+    max-width: 38ch;
+    min-height: calc(3 * 1.4em);
+    font-size: 0.875rem;
+    line-height: 1.4;
     color: var(--color-ink-2);
   }
 
-  .pt-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-
-  .pt-strip {
-    grid-column: 1 / -1;
+  .pt-thumbs {
+    grid-area: thumbs;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 7.5rem));
     gap: var(--space-3);
     padding: 0;
     list-style: none;
   }
 
-  .pt-strip figure {
+  .pt-thumb {
     display: grid;
-    gap: var(--space-2);
-  }
-
-  .pt-tile {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    background: var(--color-paper-2);
-  }
-
-  .pt-tile img,
-  .pt-tile canvas {
-    position: absolute;
-    inset: 0;
+    gap: var(--space-1);
     width: 100%;
-    height: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-ink);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .pt-thumb img {
+    width: 100%;
+    aspect-ratio: 12 / 5;
     object-fit: cover;
+    outline: 1px solid var(--color-hairline);
   }
 
-  @media (min-width: 40rem) {
+  .pt-thumb[aria-pressed='true'] img {
+    outline: 3px solid var(--color-blue);
+  }
+
+  .pt-thumb[aria-pressed='true'] .label {
+    color: var(--color-blue);
+  }
+
+  .pt-controls {
+    grid-area: controls;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+  }
+
+  /*
+   * Desktop and laptop: the render fills the first screen, edge to edge. The headline sits in the
+   * plain studio above the spheres, the bar along the bottom over a soft paper fade. The height never
+   * drops below 12:5 (very wide screens), so the cover crop only ever trims the sides, and the
+   * spheres keep their band (BAND in path-tracer.ts).
+   */
+  @media (min-width: 47.5rem) and (min-aspect-ratio: 4/3) {
+    .pt {
+      --header-h: calc(4rem + 3px);
+      grid-template-rows: auto 1fr auto;
+      height: max(36rem, calc(100svh - var(--header-h)), calc(100vw * 5 / 12));
+    }
+
     .pt-stage {
-      aspect-ratio: 16 / 9;
+      position: absolute;
+      inset: 0;
+      aspect-ratio: auto;
     }
 
-    /* Same framing as the live camera for any frame shape: the spheres fill the same safe area. */
-    .pt-still {
-      container-type: size;
+    .pt-text,
+    .pt-bar {
+      position: relative;
+      z-index: 1;
+      pointer-events: none;
     }
 
-    .pt-still img {
-      inset: 50% auto auto 50%;
-      width: auto;
-      max-width: none;
-      height: min(calc(var(--still-kh) * 100cqh), calc(var(--still-kw) * 100cqw));
-      transform: translate(-50%, -50%);
+    .pt-text > :global(*),
+    .pt-readout,
+    .pt-thumbs,
+    .pt-controls {
+      pointer-events: auto;
     }
-  }
 
-  @media (min-width: 56rem) {
-    .pt-readout {
-      grid-template-columns: auto 1fr auto;
+    .pt-text {
+      grid-row: 1;
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      align-items: end;
+      padding-block: clamp(2.5rem, 6svh, 4.5rem) 0;
     }
-  }
 
-  @media (min-width: 64rem) {
-    .pt-stage {
-      aspect-ratio: 21 / 9;
+    .pt-text :global(.display) {
+      font-size: clamp(2.5rem, min(1rem + 6vw, 9svh), 6.5rem);
+    }
+
+    .pt-bar {
+      grid-row: 3;
+    }
+
+    .pt-bar::before {
+      content: '';
+      position: absolute;
+      inset: calc(-1 * var(--space-4)) 0 0;
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-paper) 0%, transparent),
+        color-mix(in srgb, var(--color-paper) 82%, transparent) 40%,
+        color-mix(in srgb, var(--color-paper) 92%, transparent)
+      );
+    }
+
+    .pt-bar-inner {
+      position: relative;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      grid-template-areas: 'readout thumbs controls';
+      padding-block: var(--space-3) 2.25rem;
+    }
+
+    .pt-spp {
+      font-size: clamp(2rem, 5svh, 3rem);
+    }
+
+    .pt-status {
+      max-width: 48ch;
+      min-height: calc(2 * 1.4em);
+    }
+
+    .pt-thumbs {
+      grid-template-columns: repeat(3, 7.5rem);
+    }
+
+    .pt-controls {
+      justify-content: flex-end;
     }
   }
 </style>
