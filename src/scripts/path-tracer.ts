@@ -5,8 +5,8 @@
  * spherical area light. One sample per pixel per call to sample(); a running average lives in a
  * float texture (ping-pong), and show() tone-maps it to the canvas.
  *
- * The same code renders the static fallback images (see Docs/HowTo/RenderHeroImages.md), so the
- * live hero and its fallback always match.
+ * The same code renders the hero's poster and stage images (see Docs/HowTo/RenderHeroImages.md),
+ * so the live render and the pictures always match.
  */
 
 export const SPHERES: readonly (readonly [number, number, number, number])[] = [
@@ -158,10 +158,13 @@ export interface View {
 
 const EYE: Vec3 = [0, 1.25, 5.6];
 const TARGET: Vec3 = [0, 0.45, -0.2];
-/** Share of the frame the spheres may fill, so they stay clear of the soft top and bottom edges. */
-const SAFE = { x: 0.88, y: 0.66 };
-/** Each sphere is padded by this factor so its contact shadow stays in frame too. */
-const PAD = 1.3;
+
+/**
+ * Where the spheres sit in the 12:5 frame, as fractions of its width and height (v from the top).
+ * The plain studio above the band holds the headline, the space below it the hero's bottom bar.
+ * The band is narrow enough that a cover crop down to 4:3 (phones) only removes empty backdrop.
+ */
+export const BAND = { width: 0.43, top: 0.32, bottom: 0.76 };
 
 const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
@@ -172,17 +175,17 @@ const norm = (a: Vec3): Vec3 => {
 };
 
 /**
- * The box the padded spheres project to on the image plane of the fixed camera (tangent units):
+ * The box the spheres project to on the image plane of the fixed camera (tangent units):
  * centre (cx, cy) and half-size (hx, hy). Each sphere's silhouette is bounded exactly per axis.
  */
 function sceneBox() {
   const ww = norm(sub(TARGET, EYE)), uu = norm(cross(ww, [0, 1, 0])), vv = cross(uu, ww);
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
   for (const [x, y, z, r] of SPHERES) {
-    const d = sub([x, y, z], EYE), r2 = r * PAD;
+    const d = sub([x, y, z], EYE);
     const cz = dot(d, ww);
     for (const [c, axis] of [[dot(d, uu), 0], [dot(d, vv), 1]] as const) {
-      const a = Math.atan2(c, cz), s = Math.asin(r2 / Math.hypot(c, cz));
+      const a = Math.atan2(c, cz), s = Math.asin(r / Math.hypot(c, cz));
       const lo = Math.tan(a - s), hi = Math.tan(a + s);
       if (axis === 0) (x0 = Math.min(x0, lo)), (x1 = Math.max(x1, hi));
       else (y0 = Math.min(y0, lo)), (y1 = Math.max(y1, hi));
@@ -191,45 +194,24 @@ function sceneBox() {
   return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hx: (x1 - x0) / 2, hy: (y1 - y0) / 2 };
 }
 
-export const SCENE_BOX = sceneBox();
-
 /**
- * Framing for a frame of the given aspect ratio (width / height). From 1:1 up, the fixed camera
- * zooms (field of view) and shifts its lens so every sphere and its shadow fits in the safe area,
- * whatever the shape of the frame. Any such view is an exact crop of any other, so a still rendered
- * at STILL can be scaled with CSS to match the live render (see PathTracer.astro).
- * Portrait frames (phones) keep their original, fixed framing.
+ * The one framing used everywhere: the poster, the stage images and the live canvas are all
+ * rendered at FRAME.aspect with FRAME.view, and shown with the same object-fit: cover, so they line
+ * up exactly. The camera zooms and shifts its lens so the spheres fill BAND.
  */
-export function viewFor(aspect: number): View {
-  if (aspect < 1) return { eye: [0, 1.5, 7.2], target: [0, 0.55, -0.35], half: Math.tan(0.35), shift: [0, 0] };
-  const { cx, cy, hx, hy } = SCENE_BOX;
-  return { eye: EYE, target: TARGET, half: Math.max(hy / SAFE.y, hx / (SAFE.x * aspect)), shift: [cx, cy] };
-}
-
-/**
- * The wide still: rendered at STILL.aspect with half-height STILL.half, so it still covers the frame
- * for every aspect from 1.2 to 4.2. CSS sets its height to min(kh × frame height, kw × frame width).
- */
-export const STILL = (() => {
-  const { hx, hy } = SCENE_BOX;
-  const half = Math.max(hy / SAFE.y, hx / (SAFE.x * 1.2));
-  const aspect = (4.2 * hy) / SAFE.y / half;
-  return { aspect, half, kh: (half * SAFE.y) / hy, kw: (half * SAFE.x) / hx };
+export const FRAME = (() => {
+  const aspect = 12 / 5;
+  const { cx, cy, hx, hy } = sceneBox();
+  const half = Math.max(hy / (BAND.bottom - BAND.top), hx / (BAND.width * aspect));
+  // Image-plane y of the band's centre, relative to the frame's centre (v grows downwards).
+  const mid = half * (1 - (BAND.top + BAND.bottom));
+  const view: View = { eye: EYE, target: TARGET, half, shift: [cx, cy - mid] };
+  return { aspect, view };
 })();
 
 interface Target {
   tex: WebGLTexture;
   fbo: WebGLFramebuffer;
-}
-
-/** True when WebGL2 runs on the CPU (SwiftShader, llvmpipe): far too slow to path-trace live. */
-export function softwareWebGL(): boolean {
-  const gl = document.createElement('canvas').getContext('webgl2');
-  if (!gl) return false;
-  const info = gl.getExtension('WEBGL_debug_renderer_info');
-  const renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
-  gl.getExtension('WEBGL_lose_context')?.loseContext();
-  return /swiftshader|llvmpipe|softpipe|software/i.test(renderer);
 }
 
 export class PathTracer {
@@ -246,7 +228,7 @@ export class PathTracer {
   private vao: WebGLVertexArrayObject;
   private targets: Target[] = [];
   private cur = 0;
-  private view = viewFor(16 / 9);
+  private view = FRAME.view;
   private u: Record<string, WebGLUniformLocation | null> = {};
 
   /** Returns null when WebGL2 or float render targets are missing, or a shader fails. */
@@ -295,7 +277,7 @@ export class PathTracer {
     this.vao = gl.createVertexArray()!;
   }
 
-  /** Sizes the canvas to w×h device pixels. Returns true (and restarts) if the size changed. */
+  /** Sizes the canvas to w×h device pixels (keep it at FRAME.aspect). Returns true (and restarts) if the size changed. */
   resize(w: number, h: number): boolean {
     w = Math.max(2, Math.round(w));
     h = Math.max(2, Math.round(h));
@@ -303,7 +285,6 @@ export class PathTracer {
     const gl = this.gl;
     this.width = this.canvas.width = w;
     this.height = this.canvas.height = h;
-    this.view = viewFor(w / h);
     for (const t of this.targets) {
       gl.deleteTexture(t.tex);
       gl.deleteFramebuffer(t.fbo);
@@ -322,12 +303,6 @@ export class PathTracer {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     this.reset();
     return true;
-  }
-
-  /** Overrides the framing chosen by resize() (the offline still renderer uses STILL). */
-  setView(view: View) {
-    this.view = view;
-    this.reset();
   }
 
   reset() {
@@ -374,6 +349,12 @@ export class PathTracer {
   setLightFromImage(u: number, v: number) {
     this.light[0] = -3.6 + 7.2 * Math.min(1, Math.max(0, u));
     this.light[2] = 3.4 - 3.6 * Math.min(1, Math.max(0, v));
+    this.reset();
+  }
+
+  /** Puts the light back where the poster has it. */
+  resetLight() {
+    this.light = [...DEFAULT_LIGHT];
     this.reset();
   }
 

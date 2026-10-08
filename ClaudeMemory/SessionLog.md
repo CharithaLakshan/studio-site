@@ -174,3 +174,21 @@ Append one entry per session. Newest last.
   - **Hero:** keyboard focus frame visible; arrow keys restart; resize keeps the aspect (buffer 2.247 vs CSS 2.249); reduced motion and JS-off show the still.
   - **Brand swap** (Halcyon Works): 6/6 pages, 0 "LKY" hits, no identity values outside site.ts; reverted.
   - **check/build:** `npm run check` 0/0/0; build without warnings.
+
+## 2026-10-08 — Hero: full-bleed render with poster (option C)
+
+- **Asked:** redesign the home hero as a full-bleed render that opens on a pre-rendered poster; the live path tracer only on request; no jumps between poster, stages and live canvas; no cropped spheres; phones stacked.
+- **Done:**
+  - `path-tracer.ts`: one fixed 12:5 `FRAME` view with the spheres in `BAND` (43% wide, 32–76% tall); `viewFor`, `STILL`, `softwareWebGL` removed; `resetLight()` added.
+  - `PathTracer.astro`: now the whole hero (headline/tagline via slot from `index.astro`). Poster (eager, high priority, WebP q90), lazy 1/16 spp stage images, canvas, crop marks, bottom bar with counter + status, thumbnail buttons (`aria-pressed`) and Render live / Restart. Desktop overlay from 47.5rem on landscape screens; stacked below or in portrait.
+  - `path-tracer-hero.ts` rewritten as `mountHero()`: state machine (picture / running / paused / done), `import('./path-tracer')` on first start, canvas 12:5 capped at 1320×550, pauses when hidden or off-screen, light by click/drag/arrows, poster drag starts live, touch-safe.
+  - `render-hero-images.mjs`: renders poster 2880×1200 (45 min on SwiftShader), stages 1320×550, thumbs 240×100, og-default.jpg; old stills deleted.
+  - Docs: DesignSystem, PageSpecs, RenderHeroImages, Architecture; screenshots `Docs/Design/Screenshots/hero-*.jpg` (old `home-still-*` removed).
+- **Verified (headless Chromium, SwiftShader):**
+  - 1280×720, 1366×768, 1440×900, 1536×864, 1920×950, 1920×1080, 2560×1440: hero ends exactly at the fold; no text or bar (incl. fade) over the sphere band (closest gap 14 px at 1280×720); poster vs live mid-render offset 0 px.
+  - 768×1024, 390×844: stacked layout, spheres inside the 4:3 frame, offset 0 px.
+  - No WebGL context and no path-tracer request before the first click; thumbnails never load the tracer.
+  - Behaviour script: thumbnails, poster drag, arrows, pause/resume/restart, convergence to "Render again" (219 s at 320 px wide).
+  - Lighthouse mobile and desktop 100/100/100/100, LCP element = poster (mobile LCP 1.7 s, TBT 0, CLS 0). axe 0 violations (poster and stage states, 390 and 1366).
+  - `npm run check` 0/0/0, build without warnings.
+- **Note:** at default WebP quality the poster fell under Chrome's low-entropy LCP cut-off on large screens; quality 90 fixes it.

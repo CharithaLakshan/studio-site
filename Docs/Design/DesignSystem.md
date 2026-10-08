@@ -96,7 +96,7 @@ All components live in `src/components/`.
 | **SocialLinks** | `inline` (mono labels) or `big` (footer). External links get ↗ and `rel="me noopener"`. |
 | **Section** | The numbered rail (see above). Props: `n`, `label`, `title`, `id`. |
 | **PageHeader** | Mono kicker, display h1, optional lede and slot, with a 3px rule below. Used by Products, About, Privacy and product privacy pages. |
-| **PathTracer** | The hero plate, readout and strip. See "Path-traced hero". |
+| **PathTracer** | The home hero: full-bleed render, headline (slot) and bottom bar. See "Path-traced hero". |
 | **FeaturedProduct** | Large card: 2px ink border, `--color-card`, 8px ink offset shadow. ≥64rem: media (7 of 12 columns, full height, cover) beside the body. Body: tagline, short spec table (Type, Platforms, Price, Status), store buttons in a row, and a primary "View <title> →" button. |
 | **ProductCard** | 2px ink border, `--color-card`, 6px ink offset shadow. Hover or focus: −2px nudge and an 8px cobalt shadow. Contents: 16:9 media (decorative `alt=""`), mono type · platforms label, title (the link is stretched over the card), tagline, and a footer row with the price and status. |
 | **ProductGrid** | `auto-fill, minmax(19rem, 1fr)`, 2rem gap, extra right and bottom padding for the shadows. |
@@ -116,21 +116,21 @@ All components live in `src/components/`.
   - Code: `src/scripts/path-tracer.ts` (WebGL2) and `src/scripts/path-tracer-hero.ts` (DOM wiring).
   - Scene: a white studio cove (floor, curved fillet, wall) with a matte cobalt, glass, chrome, black and white sphere under one spherical light.
   - Method: unidirectional path tracing with next-event estimation, up to 6 bounces and Russian roulette. A running average lives in a ping-pong RGBA32F (or RGBA16F) target, then ACES tone mapping.
-  - Colour: the result is scaled so the cove equals `--color-paper`, and the plate's top and bottom fade into the page with a mask.
-- **Plate:** 4:5 below 40rem. On landscape screens from 40rem (and wherever `subgrid` works) the first screen holds the header, the headline and the whole plate: the plate takes the height left under the headline (`100svh` minus header and text, at least 15rem), and the headline is capped at `11svh` so it stays near a third of the screen. The spp readout starts just below the fold. Elsewhere (portrait tablets, old browsers) the plate is 16:9 to 64rem and 21:9 above. Crop marks sit in the four corners.
-- **Framing:** from 1:1 up, one fixed camera zooms and shifts its lens so every sphere, padded for its contact shadow, fits a safe area (88% wide, 66% tall) of whatever shape the plate has (`viewFor()` in path-tracer.ts). Every such view is a crop of the same image, so the wide still is scaled with container units (`--still-kh`, `--still-kw`) to match the live render exactly. Portrait plates keep the fixed phone framing.
-- **Readout:** a giant mono spp counter, a one-paragraph caption, Pause and Restart buttons, and a three-tile strip (1, 16 and 1024 spp).
-- **Behaviour:**
-  - **Before it runs,** and when it can't run (no WebGL2, no float targets, lost context), the plate shows a still frame rendered offline by the same code. The strip shows the matching 1, 16 and 1024 spp frames, so no tile is ever empty.
-  - **Reduced motion:** the still frame stays. A "Render it live" button lets the visitor opt in.
-  - **No GPU:** when WebGL2 runs on the CPU (SwiftShader, llvmpipe; `softwareWebGL()` reads the renderer name), the still frame stays too, with the same opt-in button. Software rendering would block the main thread for seconds per frame. This is also what Lighthouse and PageSpeed Insights see, as they run without a GPU.
-  - **Start:** after first paint (`requestAnimationFrame`, then idle). The still hides, and the canvas renders one sample per pixel per frame.
-  - **Budget:** device pixel ratio capped at 2, pixel budget 0.55 MP. Every desktop plate hits the budget, so cost per frame and convergence speed are the same at 1920 px, 2560 px and beyond.
-  - **Pausing:** pauses when the tab is hidden or the plate is off-screen.
-  - **Stop:** at 1024 spp it stops completely; nothing runs until the light moves.
-  - **Strip:** live frames are copied into the tiles at 1, 16 and 1024 spp. Moving the light resets them to the stills.
-  - **Input:** click or drag (or arrow keys on the focused canvas) moves the light and restarts.
-- **Fallback images:** `src/assets/hero/{wide-1024,tall-1024,strip-1,strip-16,strip-1024}.jpg`, served as responsive WebP. Regenerate them with `node scripts/render-hero-images.mjs` (Docs/HowTo/RenderHeroImages.md). The same script writes `public/og-default.jpg`.
+  - Colour: the result is scaled so the cove equals `--color-paper`.
+- **Poster first:** the page opens on a finished 1024 spp image (`poster-1024`, eager, `fetchpriority="high"`, the LCP element). The path tracer module is a separate chunk, imported with `import()` only when the visitor starts a live render; the WebGL2 context is created then too. Nothing renders unasked, so reduced motion and machines without a GPU need no special case.
+- **Framing (`FRAME`, `BAND` in path-tracer.ts):** one fixed camera and one fixed **12:5** frame for the poster, the stage images and the live canvas. All three are shown with `object-fit: cover; object-position: 50% 50%`, so swapping them never shifts the scene (headless check: 0 px offset). The lens is zoomed and shifted so the spheres' silhouettes fill a band 43% of the frame wide, from 32% to 76% of its height. Everything outside the band is empty studio, so cover-cropping (down to 4:3 on phones) only removes backdrop.
+- **Layout from 47.5rem on landscape screens (≥4:3):** the render fills the first screen edge to edge: height `100svh` minus the header, at least 36rem, and never wider than 12:5 (very wide screens get a taller hero, so the crop only ever trims the sides). On top of it:
+  - **Text:** headline (8 of 12 columns) and tagline (4 columns, aligned to the bottom of the headline) in the studio space above the band. The headline is sized by height as well as width: `clamp(2.5rem, min(1rem + 6vw, 9svh), 6.5rem)`.
+  - **Bar:** along the bottom, over a soft paper fade (`color-mix` of `--color-paper`, 0 → 82% → 92%): the spp counter with one status line under it (left), the three stage thumbnails (centre, 7.5rem each), the buttons (right).
+  - Crop marks in the four corners; the overlays pass clicks through to the render except on their text and controls.
+- **Layout on phones and portrait screens:** headline and tagline, then the render at 4:3 (with crop marks), then thumbnails, counter, status and buttons in normal flow, without the fade.
+- **Controls:**
+  - **Primary button:** Render live → Pause → Resume; after convergence, Render again. **Restart** shows only while a render is running or paused and starts again from 1 spp.
+  - **Thumbnails** (1, 16, 1024 spp) are buttons with `aria-pressed`. A click stops any live render and shows that stage full size (the 1 and 16 spp images load on first click). The active one gets a cobalt outline and label.
+  - **Status line** (`role="status"`): poster "Pre-rendered at 1024 samples per pixel. Press Render live to watch it converge in your browser."; running "Rendering live, one sample per pixel each frame."; paused "Paused at N samples per pixel."; done "Converged at 1024 samples. The GPU is idle again."; stage "This is the frame at N samples per pixel."
+  - **Light:** click or drag (or arrow keys on the focused canvas) moves the light and restarts from 1 spp. A click or drag on the poster starts a live render from that light position. On touch, a tap or a sideways drag acts; a vertical scroll never starts a render.
+- **Live render:** one sample per pixel per frame, canvas at 12:5, sized to the picture's shown size (device pixel ratio capped at 2) and capped at 1320×550 (0.73 MP). It pauses when the tab is hidden or the hero is off-screen and stops completely at 1024 spp. If WebGL2 or float targets are missing, or the context is lost, the poster stays and the status says so.
+- **Pictures:** `src/assets/hero/{poster-1024,stage-1,stage-16,thumb-1,thumb-16,thumb-1024}.jpg`, served as WebP. Regenerate them with `node scripts/render-hero-images.mjs` (Docs/HowTo/RenderHeroImages.md). The same script writes `public/og-default.jpg`.
 
 ## Placeholder art
 

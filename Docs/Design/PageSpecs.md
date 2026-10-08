@@ -7,16 +7,18 @@ Every page uses `BaseLayout`: skip link → Header → `<main id="main">` → Fo
 ## Home — `/`
 
 ```
-DESKTOP                                             MOBILE
+DESKTOP (≥47.5rem, landscape)                       MOBILE (and portrait)
 [LKY]                 PRODUCTS  ABOUT  (PORTFOLIO↗) [LKY]  PRODUCTS ABOUT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   ━━━━━━━━━━━━━━━━━━━━━━
-HEADLINE (display h1, 8 col)     tagline (4 col)    HEADLINE (display h1)
-┌ crop marks ── plate: rest of the first screen ┐   tagline
-│               (still → live canvas)            │   ┌ plate 4:5 ┐
-└───────────────────────────────────────────────┘   └───────────┘
-0384 spp   caption (one paragraph)   [PAUSE][RESTART] 0384 spp
-[1 spp tile]   [16 spp tile]   [1024 spp tile]      caption, buttons
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   [1][16][1024] tiles
+┌ full-bleed render: 100svh − header ───────────┐   HEADLINE (display h1)
+│ HEADLINE (h1, 8 col)          tagline (4 col)  │   tagline
+│                                                │   ┌ render 4:3 ┐
+│            ( spheres, in their band )          │   └────────────┘
+│ ░░░░░░░░░░░░░░░ paper fade ░░░░░░░░░░░░░░░░░░░ │   [1][16][1024] thumbs
+│ 1024 spp     [1][16][1024]    [RENDER LIVE]    │   1024 spp
+│ status line                    (RESTART)       │   status line
+└───────────────────────────────────────────────┘   [RENDER LIVE]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   ━━━━━━━━━━━━━━━━━━━━━━
 01           Rotunda (h2)                           01 FEATURED PRODUCT
 FEATURED     ┌ featured card ─────────────────┐     Rotunda
 PRODUCT      │ media 7/12 │ tagline           │     ┌ media 16:9 ┐
@@ -33,7 +35,7 @@ THESE        PORTFOLIO↗ YOUTUBE↗ GITHUB↗            links
 footer (ink): big links, wordmark + tagline, Privacy, ©
 ```
 
-- **Hero:** `site.headline` as h1, with `site.tagline` beside it on desktop and below it on mobile, then the path tracer (DesignSystem.md, "Path-traced hero").
+- **Hero:** a full-bleed path-traced render that fills the first screen, opening on a pre-rendered 1024 spp poster. `site.headline` (h1) and `site.tagline` sit on top of it in the empty studio above the spheres; a bar along the bottom holds the spp counter and status, the 1/16/1024 spp thumbnails and the buttons. On phones it stacks: text, render at 4:3, then the bar. Section 01 follows directly. Details: DesignSystem.md, "Path-traced hero".
 - **01 Featured:** the first product with `featured: true` by `order`, or else the first product. The rail h2 is the product title.
 - **02 Products:** every published product (including the featured one), then a link to the index.
 - **03 About:** owner name, alias and location from config, plus one sentence on what each product page offers. A portfolio sentence and link appear only when `site.portfolioUrl` is set.
