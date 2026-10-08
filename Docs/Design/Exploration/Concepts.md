@@ -1,10 +1,12 @@
 # Graphics-first home page concepts
 
+> **Decided 2026-10-08.** Charitha picked **Concept 3, Converge**, with two small touches from Concept 5 (the two-ink wordmark and hard offset print shadows on primary buttons and cards). Concepts 1, 2 and 4 were rejected. The graphics-first positioning below was **replaced**: the site is a product showcase, and the Lab, Kirana and the paper are not on the site. The design lab files and exploration screenshots were deleted. The final spec is Docs/Design/DesignSystem.md. This file is kept as a record.
+
 _Design exploration, 2026-10-08. Concepts only: nothing here is applied to the site yet._
 
 **Why.** The current Key Light design reads as an XR studio. The studio's priorities are, in order: (1) computer graphics and simulation, (2) game development, (3) XR. The site should feel like it was made by someone who writes renderers and simulations.
 
-**Where.** Mockups: `public/design-lab/` (gallery `index.html`, `concept-1.html` … `concept-5.html`). After merge and once Pages is enabled: <https://charithalakshan.github.io/studio-site/design-lab/>. Every page has `<meta name="robots" content="noindex">`, and none is in the sitemap. Screenshots (1440 px desktop and 390 px mobile, full page): `screenshots/`.
+**Where.** Mockups: `public/design-lab/` (gallery `index.html`, `concept-1.html` … `concept-5.html`). After merge and once Pages is enabled: <https://charithalakshan.github.io/studio-site/design-lab/>. Every page has `<meta name="robots" content="noindex">`, and none is in the sitemap. (The mockups and screenshots were deleted after the decision.)
 
 **Content rules followed.** Only the facts given in the brief for this session. Kirana and the paper are mock content for this exploration. All product art is placeholder and labelled as such. The mockups hard-code brand values because they are self-contained throwaway files (logged in Decisions.md).
 
@@ -32,7 +34,6 @@ _Design exploration, 2026-10-08. Concepts only: nothing here is applied to the s
 
 ## 1 · Key Light, Relit
 
-![Concept 1, desktop](screenshots/concept-1-desktop.jpg)
 
 **Idea.** The current design, re-angled. The decorative "light pool" becomes a real light: a coffered dome relief (log-polar coffers around an oculus, a nod to Rotunda's name) is lit live by the brand's key light. The light follows the pointer and orbits on its own when idle. Copy, nav order and a new Lab section move graphics to the front.
 
@@ -61,7 +62,6 @@ Pixel budget 1.4 MP. Cost per frame is in the range of one blur pass: **low**, b
 
 ## 2 · Viewport
 
-![Concept 2, desktop](screenshots/concept-2-desktop.jpg)
 
 **Idea.** The home page is an engine editor. The menubar is the header. The Hierarchy panel lists scene objects and page sections. The Inspector holds the hero copy as a "Studio" component, with the priorities as an ordered list. The centre is a live viewport. Lower panels: an Inspector for Rotunda (properties table), a Content Browser for products, a Lab panel with a Console that logs what this page's own renderer did, and a status-bar footer.
 
@@ -102,7 +102,6 @@ One draw per frame (two in Overdraw), pixel budget 2.2 MP: **very low**. It rend
 
 ## 3 · Converge (recommended)
 
-![Concept 3, desktop](screenshots/concept-3-desktop.jpg)
 
 **Idea.** Swiss, high-key, typographic. The hero is a live path tracer. Its white studio cove is tone-mapped to the exact page colour and masked at the edges, so the render melts into the page. Each frame adds one sample per pixel. A giant `spp` counter ticks up, and a strip records the same frame at 1, 16 and 1024 spp (captured live from the canvas). At 1024 spp it stops and the GPU goes idle. Clicking, dragging or using the arrow keys moves the light: the noise comes back and converges again. "Noise to signal" is the brand metaphor.
 
@@ -149,7 +148,6 @@ The style suits store visitors: plain, fast, legible.
 
 ## 4 · Proceedings
 
-![Concept 4, desktop](screenshots/concept-4-desktop.jpg)
 
 **Idea.** The home page is typeset as a graphics paper on a sheet of paper.
 
@@ -191,7 +189,6 @@ It ties the studio to its research area (trees) directly.
 
 ## 5 · Stir
 
-![Concept 5, desktop](screenshots/concept-5-desktop.jpg)
 
 **Idea.** A risograph zine. The hero is a print plate with crop marks. Behind the headline runs a live GPU fluid simulation, printed every frame as two spot-colour halftone screens: fluorescent pink at 15° and riso blue at 75°, with slight misregistration, multiplied over newsprint with paper grain. Moving or dragging the pointer stirs ink in; when idle, ambient drops keep it alive. Below: colour-block priority strips, a poster for Rotunda, library catalogue cards for the Lab (with a rubber "Early development" stamp), offset-shadow product cards and a big blue footer.
 
