@@ -28,9 +28,21 @@ const JSON_LD_CATEGORY = {
   experience: 'EntertainmentApplication',
 } as const;
 
+const CURRENCIES: Record<string, string> = { $: 'USD', '€': 'EUR', '£': 'GBP' };
+
+/** schema.org Offer, only when the price is known: free, or a "$4.99"-style string. */
+function offer(d: Product['data']) {
+  if (d.pricingModel === 'free' || d.pricingModel === 'free-with-in-app-purchases') {
+    return { '@type': 'Offer', price: '0', priceCurrency: 'USD' };
+  }
+  const m = d.pricingModel === 'paid' ? d.price?.match(/^([$€£])\s?(\d+(?:\.\d{1,2})?)$/) : null;
+  return m ? { '@type': 'Offer', price: m[2], priceCurrency: CURRENCIES[m[1]!] } : undefined;
+}
+
 export function productJsonLd(p: Product, pageUrl: string, image: SocialImage) {
   const d = p.data;
   const sameAs = Object.values(d.storeLinks).filter((v): v is string => !!v);
+  const offers = offer(d);
   return {
     '@context': 'https://schema.org',
     '@type': d.type === 'game' ? 'VideoGame' : 'SoftwareApplication',
@@ -43,6 +55,7 @@ export function productJsonLd(p: Product, pageUrl: string, image: SocialImage) {
     ...(d.type === 'game' ? { gamePlatform: d.platforms } : {}),
     ...(d.releaseDate ? { datePublished: d.releaseDate.toISOString().slice(0, 10) } : {}),
     ...(sameAs.length ? { sameAs } : {}),
+    ...(offers ? { offers } : {}),
     author: { '@type': 'Organization', name: site.name, url: absolute(url()) },
     publisher: { '@type': 'Organization', name: site.name, url: absolute(url()) },
   };
