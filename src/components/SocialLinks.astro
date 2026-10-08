@@ -9,9 +9,9 @@ const { variant = 'inline' } = Astro.props;
 
 /** Portfolio first: everything about the person lives there. Empty values are hidden. */
 const links = [
-  { label: 'Portfolio', href: site.portfolioUrl as string },
-  { label: 'YouTube', href: site.socials.youtube as string },
-  { label: 'GitHub', href: site.socials.github as string },
+  { label: 'Portfolio', href: site.portfolioUrl },
+  { label: 'YouTube', href: site.socials.youtube },
+  { label: 'GitHub', href: site.socials.github },
   { label: 'Email', href: site.email ? `mailto:${site.email}` : '' },
 ].filter((l) => l.href);
 ---
