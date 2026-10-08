@@ -104,7 +104,7 @@ export function mountPathTracer(root: HTMLElement) {
       if (!ctx) return;
       const s = Math.max(tile.width / canvas.width, tile.height / canvas.height);
       const w = canvas.width * s, h = canvas.height * s;
-      ctx.drawImage(canvas, (tile.width - w) / 2, (tile.height - h) * 0.6, w, h);
+      ctx.drawImage(canvas, (tile.width - w) / 2, (tile.height - h) / 2, w, h);
       tile.hidden = false;
     }
 

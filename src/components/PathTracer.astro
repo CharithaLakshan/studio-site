@@ -6,20 +6,24 @@
  */
 import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
+import { STILL } from '../scripts/path-tracer';
 import strip1 from '../assets/hero/strip-1.jpg';
 import strip16 from '../assets/hero/strip-16.jpg';
+import strip1024 from '../assets/hero/strip-1024.jpg';
 import wide1024 from '../assets/hero/wide-1024.jpg';
 import tall1024 from '../assets/hero/tall-1024.jpg';
 
 const alt =
   'A path-traced render in a white studio: a matte cobalt sphere, a glass sphere, a chrome sphere, a small black sphere and a small white sphere, lit by one soft light.';
-const wide = await getImage({ src: wide1024, widths: [640, 1024, 1680], format: 'webp' });
+const wide = await getImage({ src: wide1024, widths: [960, 1600, 2400], format: 'webp' });
+// The wide still is scaled like the live camera frames the scene (see STILL in path-tracer.ts).
+const stillVars = `--still-kh: ${STILL.kh.toFixed(4)}; --still-kw: ${STILL.kw.toFixed(4)};`;
 const tall = await getImage({ src: tall1024, widths: [432, 864], format: 'webp' });
 const strip = await Promise.all(
   [
     [strip1, '1 spp'],
     [strip16, '16 spp'],
-    [wide1024, '1024 spp'],
+    [strip1024, '1024 spp'],
   ].map(async ([src, caption]) => ({
     caption: caption as string,
     img: await getImage({ src: src as ImageMetadata, widths: [320, 640], format: 'webp', quality: 70 }),
@@ -29,12 +33,12 @@ const strip = await Promise.all(
 
 <figure class="pt" data-pt aria-labelledby="pt-note">
   <div class="pt-stage" data-pt-stage>
-    <picture class="pt-still">
+    <picture class="pt-still" style={stillVars}>
       <source media="(max-width: 39.99rem)" srcset={tall.srcSet.attribute} sizes="100vw" type="image/webp" />
       <img
         src={wide.src}
         srcset={wide.srcSet.attribute}
-        sizes="100vw"
+        sizes="140vw"
         alt={alt}
         width={wide1024.width}
         height={wide1024.height}
@@ -96,6 +100,26 @@ const strip = await Promise.all(
     border-bottom: var(--rule-thick);
   }
 
+  /*
+   * Landscape screens from 40rem: the parent .hero (src/pages/index.astro) sizes the stage row to
+   * the space left under the headline, so the whole render fits on the first screen. The figure
+   * takes that row and the next one (the readout) through subgrid.
+   */
+  @supports (grid-template-rows: subgrid) {
+    @media (min-width: 40rem) and (min-aspect-ratio: 1/1) {
+      :global(.hero) > .pt {
+        grid-row: 2 / 4;
+        grid-column: 1;
+        display: grid;
+        grid-template-rows: subgrid;
+      }
+
+      .pt-stage.pt-stage {
+        aspect-ratio: auto;
+      }
+    }
+  }
+
   .pt-stage {
     position: relative;
     aspect-ratio: 4 / 5;
@@ -111,11 +135,18 @@ const strip = await Promise.all(
   }
 
   /* The render's white cove is tone-mapped to the page colour; soft edges let it melt into the page. */
-  .pt-still img,
-  .pt-canvas {
+  .pt-still img {
     object-fit: cover;
+  }
+
+  .pt-still,
+  .pt-canvas {
     -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 88%, transparent);
+  }
+
+  .pt-still {
+    overflow: hidden;
   }
 
   .pt-canvas {
@@ -204,12 +235,24 @@ const strip = await Promise.all(
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 50% 60%;
   }
 
   @media (min-width: 40rem) {
     .pt-stage {
       aspect-ratio: 16 / 9;
+    }
+
+    /* Same framing as the live camera for any frame shape: the spheres fill the same safe area. */
+    .pt-still {
+      container-type: size;
+    }
+
+    .pt-still img {
+      inset: 50% auto auto 50%;
+      width: auto;
+      max-width: none;
+      height: min(calc(var(--still-kh) * 100cqh), calc(var(--still-kw) * 100cqw));
+      transform: translate(-50%, -50%);
     }
   }
 
