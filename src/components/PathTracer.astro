@@ -4,7 +4,6 @@
  * Before it runs, and whenever it can't, a still frame rendered by the same code is shown
  * (src/assets/hero/, regenerated with scripts/render-hero-images.mjs).
  */
-import type { ImageMetadata } from 'astro';
 import { getImage } from 'astro:assets';
 import { STILL } from '../scripts/path-tracer';
 import strip1 from '../assets/hero/strip-1.jpg';
@@ -21,12 +20,12 @@ const stillVars = `--still-kh: ${STILL.kh.toFixed(4)}; --still-kw: ${STILL.kw.to
 const tall = await getImage({ src: tall1024, widths: [432, 864], format: 'webp' });
 const strip = await Promise.all(
   [
-    [strip1, '1 spp'],
-    [strip16, '16 spp'],
-    [strip1024, '1024 spp'],
-  ].map(async ([src, caption]) => ({
-    caption: caption as string,
-    img: await getImage({ src: src as ImageMetadata, widths: [320, 640], format: 'webp', quality: 70 }),
+    { src: strip1, caption: '1 spp' },
+    { src: strip16, caption: '16 spp' },
+    { src: strip1024, caption: '1024 spp' },
+  ].map(async ({ src, caption }) => ({
+    caption,
+    img: await getImage({ src, widths: [320, 480, 640], format: 'webp', quality: 70 }),
   })),
 );
 ---
@@ -43,9 +42,11 @@ const strip = await Promise.all(
         width={wide1024.width}
         height={wide1024.height}
         decoding="async"
+        fetchpriority="high"
       />
     </picture>
     <canvas class="pt-canvas" data-pt-canvas role="img" aria-label={`${alt} Rendering live.`} aria-describedby="pt-note" hidden></canvas>
+    <span class="pt-focus" aria-hidden="true"></span>
     <span class="crop crop--tl" aria-hidden="true"></span>
     <span class="crop crop--tr" aria-hidden="true"></span>
     <span class="crop crop--bl" aria-hidden="true"></span>
@@ -54,12 +55,12 @@ const strip = await Promise.all(
 
   <div class="container pt-readout">
     <p class="pt-spp" aria-hidden="true"><span data-pt-spp>1024</span><small>spp</small></p>
-    <figcaption class="pt-note" id="pt-note" data-pt-note>
+    <p class="pt-note" id="pt-note" data-pt-note>
       This image is path-traced: each pixel averages 1024 random light paths. With JavaScript and WebGL2 on,
       it renders live in your browser.
-    </figcaption>
+    </p>
     <div class="pt-controls">
-      <button class="button" type="button" data-pt-pause aria-pressed="false" hidden>Pause</button>
+      <button class="button" type="button" data-pt-pause hidden>Pause</button>
       <button class="button" type="button" data-pt-restart hidden>Restart</button>
       <button class="button" type="button" data-pt-play hidden>Render it live</button>
     </div>
@@ -154,6 +155,23 @@ const strip = await Promise.all(
     touch-action: pan-y;
   }
 
+  /* The mask and the screen edges would hide the canvas's own outline, so focus draws a frame between the crop marks. */
+  .pt-canvas:focus-visible {
+    outline: none;
+  }
+
+  .pt-focus {
+    display: none;
+    position: absolute;
+    inset: var(--space-3) var(--gutter);
+    outline: var(--focus-ring);
+    pointer-events: none;
+  }
+
+  .pt-canvas:focus-visible + .pt-focus {
+    display: block;
+  }
+
   .is-live .pt-still {
     visibility: hidden;
   }
@@ -206,7 +224,6 @@ const strip = await Promise.all(
     flex-wrap: wrap;
     gap: var(--space-2);
   }
-
 
   .pt-strip {
     grid-column: 1 / -1;

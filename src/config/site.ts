@@ -46,6 +46,4 @@ export const site = {
   /** Language and locale for <html lang> and Open Graph. */
   lang: 'en',
   locale: 'en_GB',
-} as const;
-
-export type Site = typeof site;
+};

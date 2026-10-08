@@ -6,7 +6,7 @@ import { site } from '../config/site';
 import { url } from '../lib/url';
 
 const { owner } = site;
-const portfolio = site.portfolioUrl as string;
+const portfolio = site.portfolioUrl;
 ---
 
 <BaseLayout title="About" description={`${site.name} is the one-person studio of ${owner.name}. This site lists the products.`}>
@@ -35,9 +35,7 @@ const portfolio = site.portfolioUrl as string;
       </p>
       <p><a class="button button--primary" href={url('products/')}>See the products <span class="button-arrow" aria-hidden="true">→</span></a></p>
     </div>
-    <nav aria-label="Elsewhere">
-      <SocialLinks />
-    </nav>
+    <SocialLinks />
   </div>
 </BaseLayout>
 

@@ -4,7 +4,7 @@
 
 - **Astro 7** (static output), **TypeScript 6** strict (`astro/tsconfigs/strict`), npm.
 - Integrations: `@astrojs/sitemap`. Dev: `@astrojs/check`.
-- Plain CSS with custom-property tokens. No CSS or UI framework.
+- Plain CSS with custom-property tokens. No CSS or UI framework. All CSS (about 19 KB, 5 KB gzipped) is inlined into each page (`build.inlineStylesheets: 'always'`), so no stylesheet blocks rendering.
 - Client JS: two small vanilla module scripts. The home hero path tracer (WebGL2, about 14 KB minified with its GLSL) and the trailer click-to-load. Everything else is HTML and CSS; the header needs no script.
 - Images: `astro:assets` (`<Image>`, `getImage`, sharp). Raster images get WebP `srcset`s; SVGs pass through unchanged.
 - Hosting: GitHub Pages through GitHub Actions. No backend, CMS, database, analytics or cookies.

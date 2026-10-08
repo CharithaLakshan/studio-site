@@ -130,3 +130,47 @@ Append one entry per session. Newest last.
   - `path-tracer-hero.ts`: live strip captures centred.
   - Render script: strip at 800×450 incl. 1024 spp, wide at 2400×733 with `STILL`, og crop from the new wide. Tall still unchanged.
 - **Verification (headless Chromium):** 1280×720, 1366×768, 1440×900, 1536×864, 1920×950, 1920×1080, 2560×1440: stage bottom = viewport bottom, headline, tagline and all spheres visible: pass. 768×1024 and 390×844: nothing cut off (unchanged layout): pass. Live vs still cobalt-sphere centroid differs < 1 px at 1366, 1920, 2560 and 768. Canvas ≈ 0.55 MP at 1366, 1920 and 2560. `npm run check` 0/0/0, build without warnings.
+
+## 2026-10-08 — Stage 3: review, harden and polish
+
+- **Tools** (installed in a scratch folder, not project dependencies): Playwright + headless Chromium (SwiftShader), axe-core 4.14, Lighthouse 13.5 (mobile), html-validate 11.16, a link-check script, computed WCAG contrast. Full report: `Docs/Reviews/Stage3-Review.md`.
+- **Before:**
+  - Lighthouse mobile: Home performance 59 (TBT 84 s from the path tracer on a software GPU), other pages 100; render-blocking CSS on every page.
+  - axe: 1 violation (duplicate "Elsewhere" nav on About).
+  - Overflow: 19 px at 320 px (featured card).
+- **Fixes:**
+  - **Hero:**
+    - software WebGL (SwiftShader/llvmpipe) keeps the still with a "Render it live" opt-in (`softwareWebGL()`);
+    - a visible focus frame for the canvas (`.pt-focus`);
+    - no `aria-pressed` on Pause/Resume;
+    - `<figcaption>` → `<p>`;
+    - the canvas re-fits on resize after the render finishes;
+    - `fetchpriority="high"` on the still;
+    - 480 px strip size.
+  - **CSS:** inlined on every page (`build.inlineStylesheets: 'always'`).
+  - **Store buttons:** full width; the row layout wraps at 15rem; "Coming soon" moves under the store name instead of breaking.
+  - **Status badge:** text at `--step--1`, may wrap. The featured card column can shrink. The storefront rule is full-bleed.
+  - **SEO:**
+    - the product title drops the tagline's full stop;
+    - no `og:url` on noindex pages;
+    - product social image is a 1200×630 cover crop, with `og:image:width/height` everywhere;
+    - a raster hero under 1200×630 fails the build.
+  - **Code:**
+    - `site.ts` loses `as const` (removes 6 `as string` casts) and the unused `Site` type;
+    - duplicate wordmark rule removed;
+    - `.page-body` moved to global.css;
+    - the hero strip uses typed objects;
+    - token `--shadow-featured`.
+  - **About:** the social links are no longer a second "Elsewhere" nav.
+- **Docs:**
+  - New: `Docs/Reviews/Stage3-Review.md`, `Docs/LaunchChecklist.md`.
+  - Updated: DesignSystem.md (focus, no-GPU hero, store buttons, shadow token), Architecture.md (inlined CSS), AddProduct.md (hero ≥1200×630), Roadmap.md (Stage 3 done; outdated "mobile menu" line fixed).
+- **Verification (after):**
+  - **Lighthouse mobile:** 100/100/100/100 on Home, Products, Rotunda, About and Privacy. Home: LCP 1.2 s, TBT 0 ms, CLS 0.
+  - **axe:** 0 violations at 360 and 1280.
+  - **Layout:** no horizontal scroll at 320/360/640/768/1280/1920.
+  - **Links:** 138 internal refs OK under `/studio-site/`.
+  - **HTML:** valid, except the deliberate `role="list"`.
+  - **Hero:** keyboard focus frame visible; arrow keys restart; resize keeps the aspect (buffer 2.247 vs CSS 2.249); reduced motion and JS-off show the still.
+  - **Brand swap** (Halcyon Works): 6/6 pages, 0 "LKY" hits, no identity values outside site.ts; reverted.
+  - **check/build:** `npm run check` 0/0/0; build without warnings.

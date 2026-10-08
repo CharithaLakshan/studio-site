@@ -9,7 +9,7 @@ const nav = [
 ];
 const path = Astro.url.pathname;
 const current = (href: string) => (path === href ? 'page' : path.startsWith(href) ? 'true' : undefined);
-const portfolio = site.portfolioUrl as string;
+const portfolio = site.portfolioUrl;
 ---
 
 <header class="site-header">

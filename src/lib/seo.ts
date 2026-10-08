@@ -7,18 +7,29 @@ import type { Product } from './products';
 export interface SocialImage {
   src: string;
   alt: string;
+  width: number;
+  height: number;
 }
 
 export const defaultSocialImage: SocialImage = {
   src: url(site.defaultSocialImage),
   alt: site.defaultSocialImageAlt,
+  width: 1200,
+  height: 630,
 };
 
-/** Social platforms do not render SVG, so SVG (placeholder) heroes fall back to the default image. */
+/**
+ * A 1200×630 (1.91:1) JPEG crop of a product hero, the size Open Graph and X large cards expect.
+ * Images are never upscaled, so a smaller raster hero fails the build. Social platforms do not
+ * render SVG, so SVG (placeholder) heroes fall back to the default image.
+ */
 export async function socialImageFor(img: ImageMetadata, alt: string): Promise<SocialImage> {
   if (img.format === 'svg') return defaultSocialImage;
-  const out = await getImage({ src: img, width: 1200, format: 'jpg' });
-  return { src: out.src, alt };
+  if (img.width < 1200 || img.height < 630) {
+    throw new Error(`Hero image ${img.src} is ${img.width}×${img.height}; it must be at least 1200×630 px.`);
+  }
+  const out = await getImage({ src: img, width: 1200, height: 630, fit: 'cover', format: 'jpg' });
+  return { src: out.src, alt, width: Number(out.attributes.width), height: Number(out.attributes.height) };
 }
 
 const JSON_LD_CATEGORY = {

@@ -8,4 +8,6 @@ export default defineConfig({
   trailingSlash: 'always',
   output: 'static',
   integrations: [sitemap()],
+  // About 19 KB of CSS in all: inlining it saves a render-blocking request on every first visit.
+  build: { inlineStylesheets: 'always' },
 });

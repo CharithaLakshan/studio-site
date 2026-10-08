@@ -12,7 +12,7 @@ import { url } from '../lib/url';
 const products = await getProducts();
 const featured = await getFeaturedProduct();
 const { owner } = site;
-const hasPortfolio = !!(site.portfolioUrl as string);
+const hasPortfolio = !!site.portfolioUrl;
 let n = 0;
 ---
 

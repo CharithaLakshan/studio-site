@@ -5,7 +5,7 @@ Field details are in Docs/Architecture/ContentModel.md.
 ## Steps
 
 1. **Pick the slug.** Lowercase kebab-case, short, e.g. `night-signal`. It is **permanent** once published, because store listings will link to `/products/<slug>/`.
-2. **Add the images.** Create `src/assets/products/<slug>/` and put the hero (21:9, ideally 2100×900, PNG/JPG/WebP) and the screenshots (16:9) in it. Astro optimises them at build time. If there are no images yet, copy the placeholder SVGs from `src/assets/products/sample-product/`.
+2. **Add the images.** Create `src/assets/products/<slug>/` and put the hero (21:9, ideally 2100×900, PNG/JPG/WebP; at least 1200×630, because it is also cropped into the product's 1200×630 social image, and a smaller one fails the build) and the screenshots (16:9) in it. Astro optimises them at build time. If there are no images yet, copy the placeholder SVGs from `src/assets/products/sample-product/`.
 3. **Create the entry.** Copy `src/content/products/sample-product.md` to `src/content/products/<slug>.md`, or use the template below.
 4. **Fill in the frontmatter.** Use only facts. Anything unknown is left out, or marked with a YAML comment `# TODO(charitha): …`. Set `pricingModel` and `price` only when the price is decided; until then leave `pricingModel: tba` and the page shows "Price TBA".
 5. **Write the body.** Two to four short paragraphs of Markdown, in first person ("I made …"), short sentences: what it is, who it is for, what makes it different. Do not write the studio name; it comes from the config.

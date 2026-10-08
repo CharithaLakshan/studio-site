@@ -67,7 +67,8 @@ Paper text on the ink footer: 15.0:1.
 - Breakpoints (in media queries): 40rem (hero fills the first screen on landscape, else 16:9), 56rem (rail grid, hero text split, readout row), 64rem (hero 21:9, storefront two-column, featured card two-column).
 - `--rule`: 1px ink (table rows). `--rule-thick`: 3px ink (between page sections, under the header).
 - `--shadow-print`: `4px 4px 0` cobalt (primary buttons). Hover: `6px 6px 0` plus a −2px nudge.
-- `--shadow-card`: `6px 6px 0` ink (product cards; the featured card uses 8px). Hover: `8px 8px 0` cobalt plus a −2px nudge.
+- `--shadow-card`: `6px 6px 0` ink (product cards). Hover: `8px 8px 0` cobalt plus a −2px nudge.
+- `--shadow-featured`: `8px 8px 0` ink (the featured card).
 
 ### Motion
 
@@ -75,7 +76,7 @@ Only the hover nudge (transform), shadows and colours animate, over `--dur-fast`
 
 ### Focus
 
-`--focus-ring: 3px solid` cobalt, offset 3px, on `:focus-visible` everywhere. In the ink footer the ring is `--color-blue-on-ink`. A product card shows the ring around the whole card when its title link has focus.
+`--focus-ring: 3px solid` cobalt, offset 3px, on `:focus-visible` everywhere. In the ink footer the ring is `--color-blue-on-ink`. A product card shows the ring around the whole card when its title link has focus. The hero canvas's own outline would be hidden by the plate's mask and the screen edges, so its focus draws the ring as a frame between the crop marks (`.pt-focus`).
 
 ## Signature elements
 
@@ -99,7 +100,7 @@ All components live in `src/components/`.
 | **FeaturedProduct** | Large card: 2px ink border, `--color-card`, 8px ink offset shadow. ≥64rem: media (7 of 12 columns, full height, cover) beside the body. Body: tagline, short spec table (Type, Platforms, Price, Status), store buttons in a row, and a primary "View <title> →" button. |
 | **ProductCard** | 2px ink border, `--color-card`, 6px ink offset shadow. Hover or focus: −2px nudge and an 8px cobalt shadow. Contents: 16:9 media (decorative `alt=""`), mono type · platforms label, title (the link is stretched over the card), tagline, and a footer row with the price and status. |
 | **ProductGrid** | `auto-fill, minmax(19rem, 1fr)`, 2rem gap, extra right and bottom padding for the shadows. |
-| **StoreButtons** | Order: primary live store (`.button--primary`), other live stores (`.button`), planned stores (dashed, ink-2, "<Store> Coming soon" as plain text, not a link, not focusable). Live labels come from the store and status, e.g. "Wishlist on Steam" (pre-release), "Buy on Steam" (paid), "Get it on Google Play" (free). `stack` layout (buy box) adds a one-line note when any store is planned. |
+| **StoreButtons** | Order: primary live store (`.button--primary`), other live stores (`.button`), planned stores (dashed, ink-2, "<Store> Coming soon" as plain text, not a link, not focusable). Live labels come from the store and status, e.g. "Wishlist on Steam" (pre-release), "Buy on Steam" (paid), "Get it on Google Play" (free). Buttons are full width with the label left and the arrow or "Coming soon" right. `row` layout (featured card): buttons share a line while each gets at least 15rem, else they stack. `stack` layout (buy box) adds a one-line note when any store is planned. When a planned button is too narrow, "Coming soon" moves under the store name instead of breaking. |
 | **StatusBadge** | Mono uppercase label after a four-square gauge filled to the stage: concept 1, in development 2, early access 3, released 4 (cobalt). |
 | **SpecTable** | `.spec-table`: mono uppercase row headers, 1px ink rules. Rows: Type, Platforms, Price, Status, plus Release and Privacy in `full` mode. |
 | **FeatureList** | `ol`; each row has a cobalt mono index (01, 02 …), `--step-1` text and a 1px rule. |
@@ -122,6 +123,7 @@ All components live in `src/components/`.
 - **Behaviour:**
   - **Before it runs,** and when it can't run (no WebGL2, no float targets, lost context), the plate shows a still frame rendered offline by the same code. The strip shows the matching 1, 16 and 1024 spp frames, so no tile is ever empty.
   - **Reduced motion:** the still frame stays. A "Render it live" button lets the visitor opt in.
+  - **No GPU:** when WebGL2 runs on the CPU (SwiftShader, llvmpipe; `softwareWebGL()` reads the renderer name), the still frame stays too, with the same opt-in button. Software rendering would block the main thread for seconds per frame. This is also what Lighthouse and PageSpeed Insights see, as they run without a GPU.
   - **Start:** after first paint (`requestAnimationFrame`, then idle). The still hides, and the canvas renders one sample per pixel per frame.
   - **Budget:** device pixel ratio capped at 2, pixel budget 0.55 MP. Every desktop plate hits the budget, so cost per frame and convergence speed are the same at 1920 px, 2560 px and beyond.
   - **Pausing:** pauses when the tab is hidden or the plate is off-screen.

@@ -3,11 +3,12 @@
  *
  * - Shows the pre-rendered still until the live renderer runs, and keeps it when WebGL2 or float
  *   render targets are missing.
- * - prefers-reduced-motion: keeps the still frame. A button lets the visitor opt in.
+ * - prefers-reduced-motion, or WebGL2 running on the CPU (no GPU): keeps the still frame. A button
+ *   lets the visitor opt in.
  * - Starts after first paint, pauses when the tab is hidden or the image is off-screen, caps the
  *   device pixel ratio at 2 and stops at MAX_SPP (then nothing runs until the light moves).
  */
-import { PathTracer } from './path-tracer';
+import { PathTracer, softwareWebGL } from './path-tracer';
 
 const MAX_SPP = 1024;
 const CAPTURES = [1, 16, MAX_SPP];
@@ -17,6 +18,8 @@ const NOTE_LIVE =
   'Path-traced live in your browser, one sample per pixel per frame. It stops at 1024 samples, then the GPU goes idle. Click or drag on the image, or focus it and use the arrow keys, to move the light.';
 const NOTE_REDUCED =
   'Reduced motion is on, so this is a still frame. It was rendered ahead of time by the same path tracer, at 1024 samples per pixel.';
+const NOTE_SOFTWARE =
+  'Your browser renders WebGL without a graphics card, which is too slow for this, so this is a still frame. It was rendered ahead of time by the same path tracer, at 1024 samples per pixel.';
 const NOTE_FAILED =
   'Your browser can’t run the live renderer, so this is a still frame. It was rendered ahead of time by the same path tracer, at 1024 samples per pixel.';
 
@@ -40,8 +43,13 @@ export function mountPathTracer(root: HTMLElement) {
     note.textContent = NOTE_FAILED;
     return;
   }
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    note.textContent = NOTE_REDUCED;
+  const held = matchMedia('(prefers-reduced-motion: reduce)').matches
+    ? NOTE_REDUCED
+    : softwareWebGL()
+      ? NOTE_SOFTWARE
+      : '';
+  if (held) {
+    note.textContent = held;
     playBtn.hidden = false;
     playBtn.addEventListener('click', () => {
       playBtn.hidden = true;
@@ -57,14 +65,16 @@ export function mountPathTracer(root: HTMLElement) {
     afterFirstPaint(start);
   }
 
+  function showStill() {
+    root.classList.remove('is-live');
+    sppEl.textContent = String(MAX_SPP);
+    note.textContent = NOTE_FAILED;
+  }
+
   function start() {
-    const t = PathTracer.create(canvas);
-    if (!t) {
-      root.classList.remove('is-live');
-      sppEl.textContent = String(MAX_SPP);
-      note.textContent = NOTE_FAILED;
-      return;
-    }
+    const created = PathTracer.create(canvas);
+    if (!created) return showStill();
+    const t = created; // a const of type PathTracer, so the hoisted functions below need no `!`
     canvas.tabIndex = 0;
     pauseBtn.hidden = restartBtn.hidden = false;
     note.textContent = NOTE_LIVE;
@@ -82,17 +92,17 @@ export function mountPathTracer(root: HTMLElement) {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = r.width * dpr, h = r.height * dpr;
       const s = Math.min(1, Math.sqrt(PIXEL_BUDGET / Math.max(1, w * h)));
-      if (t!.resize(w * s, h * s)) resetTiles();
+      if (t.resize(w * s, h * s)) resetTiles();
     }
 
     function frame() {
       raf = 0;
       fit();
-      t!.sample();
-      t!.present();
+      t.sample();
+      t.present();
       canvas.hidden = false; // only after the first frame, so an empty (black) canvas never shows
-      sppEl.textContent = String(t!.spp).padStart(4, '0');
-      const i = CAPTURES.indexOf(t!.spp);
+      sppEl.textContent = String(t.spp).padStart(4, '0');
+      const i = CAPTURES.indexOf(t.spp);
       if (i >= 0) capture(tiles[i]);
       schedule();
     }
@@ -113,7 +123,7 @@ export function mountPathTracer(root: HTMLElement) {
     }
 
     function restart() {
-      t!.reset();
+      t.reset();
       resetTiles();
       schedule();
     }
@@ -142,20 +152,23 @@ export function mountPathTracer(root: HTMLElement) {
       restart();
     });
 
+    // The label says what the button does next, so it carries no aria-pressed state as well.
     pauseBtn.addEventListener('click', () => {
       paused = !paused;
-      pauseBtn.setAttribute('aria-pressed', String(paused));
       pauseBtn.textContent = paused ? 'Resume' : 'Pause';
       schedule();
     });
     restartBtn.addEventListener('click', () => {
       paused = false;
-      pauseBtn.setAttribute('aria-pressed', 'false');
       pauseBtn.textContent = 'Pause';
       restart();
     });
 
-    new ResizeObserver(schedule).observe(stage);
+    // Re-fit on resize even when the render has finished, so the canvas is never stretched.
+    new ResizeObserver(() => {
+      if (!paused) fit();
+      schedule();
+    }).observe(stage);
     new IntersectionObserver(([e]) => {
       onScreen = !!e?.isIntersecting;
       schedule();
@@ -166,8 +179,7 @@ export function mountPathTracer(root: HTMLElement) {
       cancelAnimationFrame(raf);
       canvas.hidden = true;
       pauseBtn.hidden = restartBtn.hidden = true;
-      root.classList.remove('is-live');
-      note.textContent = NOTE_FAILED;
+      showStill();
     });
     schedule();
   }

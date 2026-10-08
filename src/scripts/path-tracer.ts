@@ -222,6 +222,16 @@ interface Target {
   fbo: WebGLFramebuffer;
 }
 
+/** True when WebGL2 runs on the CPU (SwiftShader, llvmpipe): far too slow to path-trace live. */
+export function softwareWebGL(): boolean {
+  const gl = document.createElement('canvas').getContext('webgl2');
+  if (!gl) return false;
+  const info = gl.getExtension('WEBGL_debug_renderer_info');
+  const renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+  gl.getExtension('WEBGL_lose_context')?.loseContext();
+  return /swiftshader|llvmpipe|softpipe|software/i.test(renderer);
+}
+
 export class PathTracer {
   readonly canvas: HTMLCanvasElement;
   spp = 0;
