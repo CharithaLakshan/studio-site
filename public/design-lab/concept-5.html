@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Concept 5 · Stir · [LKY] design lab</title>
+<meta name="description" content="Design lab mockup. Concept 5: a risograph zine around a live GPU fluid simulation, printed as two-ink halftone, that visitors stir with the pointer.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f1ece1;
+  --paper-2: #e9e2d3;
+  --ink: #1c1a24;
+  --ink-2: #5b5566;
+  --pink: #ff48b0;
+  --pink-text: #b8005f;
+  --blue: #0078bf;
+  --blue-deep: #3255a4;
+  --sans: 'Bricolage Grotesque', system-ui, sans-serif;
+  --mono: 'DM Mono', ui-monospace, monospace;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --t: 160ms;
+}
+@media (prefers-reduced-motion: reduce) { :root { --t: 0ms; } }
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--paper); color: var(--ink); font: 400 clamp(1rem, .96rem + .2vw, 1.125rem)/1.55 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+a { color: var(--pink-text); text-underline-offset: .18em; text-decoration-thickness: 2px; }
+a:hover { color: var(--ink); }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: 0 0 0 7px var(--pink); }
+h1, h2, h3 { line-height: .95; text-wrap: balance; font-stretch: 75%; font-weight: 800; letter-spacing: -.01em; }
+p { text-wrap: pretty; }
+.skip { position: absolute; left: -999px; top: 0; z-index: 10; background: var(--ink); color: var(--paper); padding: .5rem 1rem; }
+.skip:focus { left: 1rem; top: 1rem; }
+.lab-bar { background: var(--ink); color: var(--paper); font: 400 .75rem/1.4 var(--mono); padding: .5rem var(--gutter); text-align: center; }
+.lab-bar a { color: #ffb3dc; }
+.wrap { width: min(100% - 2 * var(--gutter), 80rem); margin-inline: auto; }
+.mono { font-family: var(--mono); }
+.tag { display: inline-block; font: 500 .75rem/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; padding: .375rem .5rem; border: 1.5px solid var(--ink); background: var(--paper); }
+
+/* Header */
+.site-header .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .25rem 1.5rem; padding-block: .75rem; }
+.wordmark { font: 800 2rem/1 var(--sans); font-stretch: 75%; color: var(--ink); text-decoration: none; letter-spacing: .01em; text-shadow: 2px 1.5px 0 var(--pink), -2px -1px 0 rgb(0 120 191 / .8); display: inline-flex; align-items: center; min-height: 44px; }
+.nav { display: flex; flex-wrap: wrap; list-style: none; padding: 0; gap: 0 1.25rem; }
+.nav a { display: inline-flex; align-items: center; min-height: 44px; font: 500 .875rem/1 var(--mono); text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.nav a:hover { color: var(--pink-text); text-decoration: underline; }
+
+/* Hero: the print plate */
+.hero { position: relative; isolation: isolate; min-height: min(92svh, 58rem); display: grid; align-content: end; border-block: 2px solid var(--ink); touch-action: pan-y; }
+.hero canvas, .hero .fallback { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: -1; }
+.hero .fallback { display: none; }
+.no-gl .hero .fallback { display: block; }
+.no-gl .hero canvas, .no-gl .hero .ctl { display: none; }
+.fallback::before, .fallback::after { content: ''; position: absolute; inset: 0; }
+.fallback::before { background: radial-gradient(circle, var(--pink) 0 42%, transparent 46%) 0 0 / 9px 9px; -webkit-mask: radial-gradient(ellipse 45% 55% at 25% 40%, #000 30%, transparent 70%); mask: radial-gradient(ellipse 45% 55% at 25% 40%, #000 30%, transparent 70%); }
+.fallback::after { background: radial-gradient(circle, var(--blue) 0 42%, transparent 46%) 2px 1px / 9px 9px; mix-blend-mode: multiply; -webkit-mask: radial-gradient(ellipse 45% 50% at 70% 55%, #000 30%, transparent 70%); mask: radial-gradient(ellipse 45% 50% at 70% 55%, #000 30%, transparent 70%); }
+.crop { position: absolute; width: 1.5rem; height: 1.5rem; border: 0 solid var(--ink); pointer-events: none; }
+.crop.tl { top: .75rem; left: .75rem; border-top-width: 1.5px; border-left-width: 1.5px; }
+.crop.tr { top: .75rem; right: .75rem; border-top-width: 1.5px; border-right-width: 1.5px; }
+.crop.bl { bottom: .75rem; left: .75rem; border-bottom-width: 1.5px; border-left-width: 1.5px; }
+.crop.br { bottom: .75rem; right: .75rem; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+.hero-in { display: grid; gap: 1.25rem; padding-block: 6rem 2.5rem; pointer-events: none; }
+.hero-in a, .hero-in button { pointer-events: auto; }
+.hero h1 { font-size: clamp(2.75rem, .9rem + 7.4vw, 8rem); line-height: 1.02; max-width: 13ch; }
+.ko { background: var(--paper); -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 .12em; }
+.sticker { background: var(--paper); border: 2px solid var(--ink); padding: 1rem 1.125rem; max-width: 36rem; box-shadow: 6px 6px 0 var(--ink); }
+.sticker p + p { margin-top: .5rem; }
+.hero-row { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem; }
+.btn { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: 0 1.125rem; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); font: 500 .875rem/1 var(--mono); text-transform: uppercase; text-decoration: none; cursor: pointer; box-shadow: 4px 4px 0 var(--pink); transition: box-shadow var(--t), transform var(--t); }
+.btn:hover { color: var(--paper); transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--pink); }
+.btn--light { background: var(--paper); color: var(--ink); box-shadow: 4px 4px 0 var(--blue); }
+.btn--light:hover { color: var(--ink); box-shadow: 6px 6px 0 var(--blue); }
+.btns { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+/* Priorities */
+.prio { list-style: none; padding: 0; display: grid; border-bottom: 2px solid var(--ink); }
+@media (min-width: 56rem) { .prio { grid-template-columns: 1.4fr 1fr 1fr; } }
+.prio li { padding: 1.75rem var(--gutter); display: grid; gap: .5rem; align-content: start; }
+.prio li + li { border-top: 2px solid var(--ink); }
+@media (min-width: 56rem) { .prio li + li { border-top: 0; border-left: 2px solid var(--ink); } }
+.prio li:nth-child(1) { background: var(--pink); }
+.prio li:nth-child(2) { background: var(--blue-deep); color: var(--paper); }
+.prio .n { font: 500 .875rem/1 var(--mono); }
+.prio h2 { font-size: clamp(2rem, 1.3rem + 2.6vw, 3.5rem); }
+
+/* Sections */
+.sec { padding-block: clamp(3rem, 8vw, 6rem); border-bottom: 2px solid var(--ink); }
+.sec-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: .75rem 1.25rem; margin-bottom: 2rem; }
+.sec-h h2 { font-size: clamp(2.75rem, 1.4rem + 5vw, 6rem); }
+.poster { display: grid; gap: 2rem; align-items: center; }
+@media (min-width: 56rem) { .poster { grid-template-columns: 1.1fr 1fr; } }
+.plate { position: relative; aspect-ratio: 1; max-width: 36rem; border: 2px solid var(--ink); background: var(--paper-2); overflow: hidden; }
+.plate .dots-p, .plate .dots-b { position: absolute; inset: 0; }
+.plate .dots-p { background: radial-gradient(circle, var(--pink) 0 40%, transparent 44%) 0 0 / 10px 10px; -webkit-mask: radial-gradient(circle at 50% 100%, #000 0 30%, transparent 30.5% 38%, #000 38.5% 46%, transparent 46.5% 54%, #000 54.5% 62%, transparent 62.5%); mask: radial-gradient(circle at 50% 100%, #000 0 30%, transparent 30.5% 38%, #000 38.5% 46%, transparent 46.5% 54%, #000 54.5% 62%, transparent 62.5%); }
+.plate .dots-b { background: radial-gradient(circle, var(--blue) 0 40%, transparent 44%) 3px 2px / 10px 10px; mix-blend-mode: multiply; -webkit-mask: radial-gradient(ellipse 60% 50% at 30% 20%, #000, transparent 70%); mask: radial-gradient(ellipse 60% 50% at 30% 20%, #000, transparent 70%); }
+.plate .tag { position: absolute; left: .75rem; top: .75rem; }
+.poster h3 { font-size: clamp(4rem, 2rem + 8vw, 9rem); line-height: .85; }
+.facts { list-style: none; padding: 0; font: 400 .9375rem/1.5 var(--mono); border-top: 2px solid var(--ink); margin-block: 1.25rem; }
+.facts li { padding-block: .5rem; border-bottom: 1px dashed var(--ink); display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; }
+.facts li span:first-child { color: var(--ink-2); }
+.cards { list-style: none; padding: 0; display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); }
+.card { position: relative; background: var(--paper); border: 2px solid var(--ink); box-shadow: 8px 8px 0 var(--pink); padding: 1.25rem; display: grid; gap: .75rem; align-content: start; transition: box-shadow var(--t), transform var(--t); }
+.card:nth-child(2) { box-shadow: 8px 8px 0 var(--blue); }
+.card:hover, .card:focus-within { transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--ink); }
+.card h3 { font-size: 2.75rem; }
+.card h3 a { color: var(--ink); text-decoration: none; }
+.card h3 a::after { content: ''; position: absolute; inset: 0; }
+.card:has(a:focus-visible) { outline: 3px solid var(--ink); outline-offset: 4px; }
+.card h3 a:focus-visible { outline: none; box-shadow: none; }
+.card .swatch { aspect-ratio: 16 / 9; border: 1.5px solid var(--ink); position: relative; background: radial-gradient(circle, var(--ink) 0 22%, transparent 26%) 0 0 / 8px 8px, var(--paper-2); }
+.card:nth-child(1) .swatch { background: radial-gradient(circle, var(--pink) 0 40%, transparent 44%) 0 0 / 8px 8px, var(--paper-2); }
+.card:nth-child(2) .swatch { background: radial-gradient(circle, var(--blue) 0 38%, transparent 42%) 0 0 / 8px 8px, var(--paper-2); }
+.card .swatch .tag { position: absolute; left: .5rem; top: .5rem; font-size: .625rem; }
+.card p.m { font: 400 .875rem/1.5 var(--mono); color: var(--ink-2); }
+.card.slot { border-style: dashed; box-shadow: none; background: transparent; place-content: center; text-align: center; min-height: 18rem; color: var(--ink-2); font: 400 .875rem/1.5 var(--mono); }
+.card.slot:hover { transform: none; }
+.catalog { display: grid; gap: 2rem; }
+@media (min-width: 56rem) { .catalog { grid-template-columns: 1fr 1fr; } }
+.lcard { position: relative; background: #fbf8f1; border: 2px solid var(--ink); padding: 1.25rem 1.25rem 1.5rem; background-image: repeating-linear-gradient(to bottom, transparent 0 1.6rem, rgb(50 85 164 / .22) 1.6rem calc(1.6rem + 1px)); background-position: 0 3.4rem; display: grid; gap: .5rem; align-content: start; }
+.lcard:nth-child(1) { rotate: -.6deg; }
+.lcard:nth-child(2) { rotate: .5deg; }
+@media (prefers-reduced-motion: reduce) { .lcard { rotate: 0deg !important; } }
+.lcard .head { display: flex; justify-content: space-between; gap: 1rem; font: 500 .75rem/1.4 var(--mono); text-transform: uppercase; border-bottom: 2px solid var(--pink); padding-bottom: .5rem; }
+.lcard h3 { font-size: clamp(2.25rem, 1.6rem + 2vw, 3.25rem); }
+.lcard .line { font: 400 .9375rem/1.6rem var(--mono); }
+.lcard:has(.stamp) { padding-bottom: 8.5rem; }
+.stamp { position: absolute; right: 1rem; bottom: 1rem; width: 6.5rem; height: 6.5rem; border: 3px double var(--pink-text); border-radius: 50%; display: grid; place-content: center; text-align: center; font: 500 .6875rem/1.25 var(--mono); text-transform: uppercase; color: var(--pink-text); rotate: -14deg; background: rgb(251 248 241 / .85); }
+.lcard .pt { font-size: 1.25rem; font-weight: 700; font-stretch: 85%; line-height: 1.2; }
+.about p { font-size: clamp(1.375rem, 1.1rem + 1.2vw, 2.125rem); font-weight: 600; font-stretch: 85%; line-height: 1.2; max-width: 30ch; }
+
+/* Footer */
+footer { background: var(--blue-deep); color: var(--paper); padding-block: clamp(3rem, 7vw, 5rem) 1.5rem; }
+footer a { color: var(--paper); }
+footer a:hover { color: #ffd0ea; }
+.big { list-style: none; padding: 0; }
+.big a { font: 800 clamp(3rem, 1.5rem + 7vw, 8rem)/1 var(--sans); font-stretch: 75%; text-decoration-thickness: 4px; display: inline-block; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .75rem 2rem; margin-top: 2.5rem; font: 400 .8125rem/1.5 var(--mono); border-top: 1.5px solid var(--paper); padding-top: 1rem; }
+.foot a { display: inline-flex; align-items: center; min-height: 44px; }
+footer .wordmark { color: var(--paper); font-size: 1.5rem; text-shadow: 2px 1.5px 0 var(--pink); min-height: auto; }
+
+.debug { position: fixed; right: .75rem; bottom: .75rem; z-index: 50; font: 500 .75rem/1.5 var(--mono); color: var(--paper); background: var(--ink); border: 2px solid var(--pink); padding: .5rem .75rem; white-space: pre; pointer-events: none; }
+</style>
+</head>
+<body>
+<p class="lab-bar">Design lab mockup, not the live site · Concept 5 of 5 · <a href="./">All concepts</a></p>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="#main" aria-label="[LKY] home">[LKY]</a>
+    <nav aria-label="Main">
+      <ul class="nav">
+        <li><a href="#rotunda">Rotunda</a></li>
+        <li><a href="#lab">Lab</a></li>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="hero" aria-labelledby="hero-title">
+    <canvas id="gfx" aria-hidden="true"></canvas>
+    <div class="fallback" aria-hidden="true"></div>
+    <span class="crop tl" aria-hidden="true"></span><span class="crop tr" aria-hidden="true"></span><span class="crop bl" aria-hidden="true"></span><span class="crop br" aria-hidden="true"></span>
+    <div class="wrap hero-in">
+      <p><span class="tag">Live fluid sim · two-ink halftone · drag to stir</span></p>
+      <h1 id="hero-title"><span class="ko">Real-time graphics and simulation you can stir.</span></h1>
+      <div class="hero-row">
+        <div class="sticker">
+          <p>[LKY] is a one-person studio from Sri Lanka. Renderers, simulations and procedural generation come first, games next, XR after that.</p>
+          <p class="mono" style="font-size:.8125rem;color:var(--ink-2)">The ink behind this text is a GPU fluid simulation (WebGL2), printed every frame as a pink and blue risograph halftone.</p>
+        </div>
+        <div class="btns">
+          <a class="btn" href="#lab">Open the lab</a>
+          <button class="btn btn--light ctl" type="button" id="pause" aria-pressed="false">Pause ink</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <ol class="prio" aria-label="Priorities">
+    <li><span class="n">01 / main interest</span><h2>Graphics &amp; simulation</h2><p>Rendering, real-time graphics, simulation, procedural generation.</p></li>
+    <li><span class="n">02</span><h2>Games</h2><p>Game development.</p></li>
+    <li><span class="n">03 / the day job</span><h2>XR</h2><p>XR experiences.</p></li>
+  </ol>
+
+  <section class="sec" id="rotunda" aria-labelledby="rotunda-title">
+    <div class="wrap poster">
+      <div class="plate" role="img" aria-label="Placeholder art for Rotunda, not a screenshot. Halftone rings of a dome in pink and blue.">
+        <div class="dots-p"></div><div class="dots-b"></div>
+        <span class="tag">Placeholder art</span>
+      </div>
+      <div>
+        <p class="tag" style="background:var(--pink)">Featured · in development</p>
+        <h3 id="rotunda-title" style="margin-top:1rem">Rotunda</h3>
+        <p style="font-size:1.375rem;font-weight:600;font-stretch:85%;margin-top:1rem;line-height:1.25">A VR video player for 360°, 180° and flat video.</p>
+        <ul class="facts">
+          <li><span>Platform</span><span>Windows PC VR</span></li>
+          <li><span>Video</span><span>Mono and stereo</span></li>
+          <li><span>Built with</span><span>Unity, own FFmpeg-based decoders</span></li>
+          <li><span>Stores</span><span>Steam, Meta Horizon Store (planned)</span></li>
+        </ul>
+        <a class="btn" href="../products/rotunda/">View Rotunda →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="lab" aria-labelledby="lab-title">
+    <div class="wrap">
+      <div class="sec-h"><h2 id="lab-title">From the lab</h2><span class="tag">Renderers · research</span></div>
+      <div class="catalog">
+        <article class="lcard" aria-labelledby="k-title">
+          <div class="head"><span>Renderer</span><span>Working name</span></div>
+          <h3 id="k-title">Kirana</h3>
+          <p class="line">Written from scratch in C++, C style.</p>
+          <p class="line">CPU software renderer first.</p>
+          <p class="line">Vulkan port later.</p>
+          <p class="line">Pipeline stages (e.g. anti-aliasing modes) swap live.</p>
+          <p class="line">Planned: ray and path tracing visualisation.</p>
+          <p class="stamp" aria-label="Status: early development">Early<br>develop-<br>ment</p>
+        </article>
+        <article class="lcard" aria-labelledby="p-title">
+          <div class="head"><span>Paper · first author</span><span>IJACSA 2026</span></div>
+          <h3 id="p-title">Tree research</h3>
+          <p class="pt">A Behavioral Analysis of Machine Learning for Intrinsic 3D Tree Branching Structures</p>
+          <p class="line">M. Charitha Lakshan, K. Damitha Sandaruwan, L. N. C. De Silva</p>
+          <p class="line">IJACSA, Vol. 17, No. 7, 2026</p>
+          <p class="line">Area: procedural and ML-based 3D tree generation</p>
+          <p class="line"><a href="https://doi.org/10.14569/IJACSA.2026.0170783">DOI 10.14569/IJACSA.2026.0170783</a></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="products" aria-labelledby="products-title">
+    <div class="wrap">
+      <div class="sec-h"><h2 id="products-title">Products</h2><span class="tag">Each with a permanent page</span></div>
+      <ul class="cards">
+        <li class="card"><div class="swatch"><span class="tag">Placeholder</span></div><p class="mono" style="font-size:.8125rem">App · Windows PC VR</p><h3><a href="../products/rotunda/">Rotunda</a></h3><p class="m">In development</p></li>
+        <li class="card"><div class="swatch"><span class="tag">Placeholder</span></div><p class="mono" style="font-size:.8125rem">Renderer · working name</p><h3><a href="#lab">Kirana</a></h3><p class="m">Early development</p></li>
+        <li class="card slot">Placeholder slot.<br>Future products get printed here.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sec about" id="about" aria-labelledby="about-title">
+    <div class="wrap">
+      <div class="sec-h"><h2 id="about-title">Who</h2></div>
+      <p>M. Charitha Lakshan (“Lucky”). Immersive Experience Engineer by day, final-year Computer Science at UCSC, Sri Lanka, graphics programmer by choice.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <ul class="big">
+      <li><a href="https://www.youtube.com/@mrtheplaylist.1437">YouTube ↗</a></li>
+      <li><a href="https://github.com/CharithaLakshan">GitHub ↗</a></li>
+    </ul>
+    <div class="foot">
+      <span><a class="wordmark" href="#main">[LKY]</a> Real-time graphics and simulation you can stir.</span>
+      <span><a href="../privacy/">Privacy</a> · © 2026 M. Charitha Lakshan</span>
+    </div>
+  </div>
+</footer>
+
+<div class="debug" id="debug" hidden aria-hidden="true"></div>
+
+<script>
+(() => {
+  'use strict';
+  const root = document.documentElement;
+  const cv = document.getElementById('gfx');
+  const hero = document.getElementById('hero');
+  const btn = document.getElementById('pause');
+  const dbg = document.getElementById('debug');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fail = () => root.classList.add('no-gl');
+
+  const gl = cv.getContext('webgl2', { antialias: false, alpha: false, depth: false, powerPreference: 'low-power' });
+  if (!gl) return fail();
+  if (!gl.getExtension('EXT_color_buffer_float') && !gl.getExtension('EXT_color_buffer_half_float')) return fail();
+
+  const VS = `#version 300 es
+  uniform vec2 uTexel;
+  out vec2 vUv, vL, vR, vT, vB;
+  void main(){
+    vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+    vUv = p; vL = p - vec2(uTexel.x, 0.0); vR = p + vec2(uTexel.x, 0.0); vT = p + vec2(0.0, uTexel.y); vB = p - vec2(0.0, uTexel.y);
+    gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+  }`;
+  const H = `#version 300 es
+  precision highp float; precision highp sampler2D;
+  in vec2 vUv, vL, vR, vT, vB; out vec4 o;
+  `;
+  // Stable fluids (Stam 1999) on the GPU: curl, vorticity confinement, divergence, Jacobi pressure, projection, advection.
+  const FS = {
+    curl: H + `uniform sampler2D uVel;
+      void main(){ float L = texture(uVel, vL).y, R = texture(uVel, vR).y, T = texture(uVel, vT).x, B = texture(uVel, vB).x; o = vec4(0.5 * (R - L - T + B), 0, 0, 1); }`,
+    vort: H + `uniform sampler2D uVel, uCurl; uniform float uAmt, uDt;
+      void main(){
+        float L = texture(uCurl, vL).x, R = texture(uCurl, vR).x, T = texture(uCurl, vT).x, B = texture(uCurl, vB).x, C = texture(uCurl, vUv).x;
+        vec2 f = 0.5 * vec2(abs(T) - abs(B), abs(R) - abs(L)); f /= length(f) + 1e-4; f *= uAmt * C; f.y *= -1.0;
+        o = vec4(clamp(texture(uVel, vUv).xy + f * uDt, -1000.0, 1000.0), 0, 1); }`,
+    div: H + `uniform sampler2D uVel;
+      void main(){
+        float L = texture(uVel, vL).x, R = texture(uVel, vR).x, T = texture(uVel, vT).y, B = texture(uVel, vB).y; vec2 C = texture(uVel, vUv).xy;
+        if (vL.x < 0.0) L = -C.x; if (vR.x > 1.0) R = -C.x; if (vT.y > 1.0) T = -C.y; if (vB.y < 0.0) B = -C.y;
+        o = vec4(0.5 * (R - L + T - B), 0, 0, 1); }`,
+    scale: H + `uniform sampler2D uSrc; uniform float uK; void main(){ o = uK * texture(uSrc, vUv); }`,
+    jacobi: H + `uniform sampler2D uP, uDiv;
+      void main(){ float L = texture(uP, vL).x, R = texture(uP, vR).x, T = texture(uP, vT).x, B = texture(uP, vB).x; o = vec4((L + R + B + T - texture(uDiv, vUv).x) * 0.25, 0, 0, 1); }`,
+    grad: H + `uniform sampler2D uP, uVel;
+      void main(){ float L = texture(uP, vL).x, R = texture(uP, vR).x, T = texture(uP, vT).x, B = texture(uP, vB).x; o = vec4(texture(uVel, vUv).xy - vec2(R - L, T - B), 0, 1); }`,
+    advect: H + `uniform sampler2D uVel, uSrc; uniform vec2 uSimTexel; uniform float uDt, uDiss;
+      void main(){ vec2 c = vUv - uDt * texture(uVel, vUv).xy * uSimTexel; o = texture(uSrc, c) / (1.0 + uDiss * uDt); }`,
+    splat: H + `uniform sampler2D uTarget; uniform float uAspect, uRadius; uniform vec2 uPoint; uniform vec3 uColor;
+      void main(){ vec2 p = vUv - uPoint; p.x *= uAspect; o = vec4(texture(uTarget, vUv).xyz + exp(-dot(p, p) / uRadius) * uColor, 1); }`,
+    // Print: two AM halftone screens (pink 15°, blue 75°), a little misregistration, multiply over paper, paper grain.
+    print: H + `uniform sampler2D uDye; uniform vec2 uRes, uMis; uniform float uCell;
+      const vec3 PAPER = vec3(0.945, 0.925, 0.882), PINK = vec3(1.0, 0.282, 0.69), BLUE = vec3(0.0, 0.471, 0.749);
+      float screenDot(vec2 frag, float ang, int ch){
+        float c = cos(ang), s = sin(ang); mat2 R = mat2(c, s, -s, c);
+        vec2 p = R * frag / uCell;
+        vec2 centre = transpose(R) * ((floor(p) + 0.5) * uCell);
+        float v = texture(uDye, centre / uRes)[ch];
+        v = 1.0 - exp(-max(v, 0.0) * 1.7);
+        float r = sqrt(v) * 0.76, d = length(fract(p) - 0.5), aa = 0.9 / uCell;
+        return (1.0 - smoothstep(r - aa, r + aa, d)) * smoothstep(0.0, aa, r);
+      }
+      float hash(vec2 p){ p = fract(p * vec2(443.897, 441.423)); p += dot(p, p.yx + 19.19); return fract((p.x + p.y) * p.x); }
+      void main(){
+        vec2 f = gl_FragCoord.xy;
+        float cp = screenDot(f, 0.2618, 0), cb = screenDot(f + uMis, 1.309, 1);
+        vec3 col = PAPER * mix(vec3(1.0), PINK, cp * 0.95) * mix(vec3(1.0), BLUE, cb * 0.92);
+        col *= 1.0 - 0.035 * hash(floor(f));
+        o = vec4(col, 1);
+      }`,
+  };
+
+  const P = {};
+  try {
+    const mk = (src, type) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+    const vs = mk(VS, gl.VERTEX_SHADER);
+    for (const [k, src] of Object.entries(FS)) {
+      const p = gl.createProgram(); gl.attachShader(p, vs); gl.attachShader(p, mk(src, gl.FRAGMENT_SHADER)); gl.linkProgram(p);
+      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+      const cache = {};
+      P[k] = { p, u: (n) => cache[n] ?? (cache[n] = gl.getUniformLocation(p, n)) };
+    }
+  } catch (e) { console.warn(e); return fail(); }
+  const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+
+  function target(w, h) {
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    const f = gl.createFramebuffer(); gl.bindFramebuffer(gl.FRAMEBUFFER, f);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) throw new Error('RGBA16F not renderable');
+    gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+    return { t, f, w, h };
+  }
+  const pair = (w, h) => { let a = target(w, h), b = target(w, h); return { get r() { return a; }, get w() { return b; }, swap() { [a, b] = [b, a]; } }; };
+  const free = (x) => { if (x) { gl.deleteTexture(x.t); gl.deleteFramebuffer(x.f); } };
+
+  let W = 0, Hh = 0, vel, dye, prs, div, curl, simTexel = [0, 0], dpr = 1, scale = 1, passes = 0;
+  function resize() {
+    const r = hero.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w = r.width * dpr, h = r.height * dpr;
+    scale = Math.min(1, Math.sqrt(2.4e6 / Math.max(1, w * h)));
+    w = Math.max(2, Math.round(w * scale)); h = Math.max(2, Math.round(h * scale));
+    if (w === W && h === Hh) return false;
+    W = cv.width = w; Hh = cv.height = h;
+    const a = w / h, sim = 128, dres = 512;
+    const sw = a >= 1 ? Math.round(sim * a) : sim, sh = a >= 1 ? sim : Math.round(sim / a);
+    const dw = a >= 1 ? Math.round(dres * a) : dres, dh = a >= 1 ? dres : Math.round(dres / a);
+    try {
+      [vel?.r, vel?.w, dye?.r, dye?.w, prs?.r, prs?.w, div, curl].forEach(free);
+      vel = pair(sw, sh); prs = pair(sw, sh); div = target(sw, sh); curl = target(sw, sh); dye = pair(dw, dh);
+    } catch (e) { console.warn(e); fail(); return false; }
+    simTexel = [1 / sw, 1 / sh];
+    return true;
+  }
+  function pass(name, dst, setup) {
+    const p = P[name]; gl.useProgram(p.p);
+    gl.uniform2f(p.u('uTexel'), simTexel[0], simTexel[1]);
+    let unit = 0;
+    setup(p, (n, t) => { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t.t); gl.uniform1i(p.u(n), unit++); });
+    gl.bindFramebuffer(gl.FRAMEBUFFER, dst ? dst.f : null);
+    gl.viewport(0, 0, dst ? dst.w : W, dst ? dst.h : Hh);
+    gl.drawArrays(gl.TRIANGLES, 0, 3); passes++;
+  }
+  function step(dt) {
+    pass('curl', curl, (p, tex) => tex('uVel', vel.r));
+    pass('vort', vel.w, (p, tex) => { tex('uVel', vel.r); tex('uCurl', curl); gl.uniform1f(p.u('uAmt'), 24); gl.uniform1f(p.u('uDt'), dt); }); vel.swap();
+    pass('div', div, (p, tex) => tex('uVel', vel.r));
+    pass('scale', prs.w, (p, tex) => { tex('uSrc', prs.r); gl.uniform1f(p.u('uK'), 0.8); }); prs.swap();
+    for (let i = 0; i < 20; i++) { pass('jacobi', prs.w, (p, tex) => { tex('uP', prs.r); tex('uDiv', div); }); prs.swap(); }
+    pass('grad', vel.w, (p, tex) => { tex('uP', prs.r); tex('uVel', vel.r); }); vel.swap();
+    pass('advect', vel.w, (p, tex) => { tex('uVel', vel.r); tex('uSrc', vel.r); gl.uniform2fv(p.u('uSimTexel'), simTexel); gl.uniform1f(p.u('uDt'), dt); gl.uniform1f(p.u('uDiss'), 0.15); }); vel.swap();
+    pass('advect', dye.w, (p, tex) => { tex('uVel', vel.r); tex('uSrc', dye.r); gl.uniform2fv(p.u('uSimTexel'), simTexel); gl.uniform1f(p.u('uDt'), dt); gl.uniform1f(p.u('uDiss'), 0.22); }); dye.swap();
+  }
+  function splat(x, y, dx, dy, ink, size = 1) {
+    const aspect = W / Hh;
+    pass('splat', vel.w, (p, tex) => { tex('uTarget', vel.r); gl.uniform1f(p.u('uAspect'), aspect); gl.uniform1f(p.u('uRadius'), 0.0022 * size); gl.uniform2f(p.u('uPoint'), x, y); gl.uniform3f(p.u('uColor'), dx, dy, 0); }); vel.swap();
+    pass('splat', dye.w, (p, tex) => { tex('uTarget', dye.r); gl.uniform1f(p.u('uAspect'), aspect); gl.uniform1f(p.u('uRadius'), 0.006 * size); gl.uniform2f(p.u('uPoint'), x, y); gl.uniform3f(p.u('uColor'), ink === 0 ? 1.1 : 0, ink === 1 ? 1.1 : 0, 0); }); dye.swap();
+  }
+  function print() {
+    pass('print', null, (p, tex) => {
+      tex('uDye', dye.r); gl.uniform2f(p.u('uRes'), W, Hh);
+      gl.uniform1f(p.u('uCell'), 6 * dpr * scale); gl.uniform2f(p.u('uMis'), 1.6 * dpr * scale, -1.1 * dpr * scale);
+    });
+  }
+  let ambientInk = 0;
+  function ambient(big) {
+    const x = 0.1 + Math.random() * 0.8, y = 0.15 + Math.random() * 0.75, a = Math.random() * 6.283, f = big ? 900 : 600;
+    splat(x, y, Math.cos(a) * f, Math.sin(a) * f, ambientInk, big ? 2.2 : 1.4); ambientInk ^= 1;
+  }
+  function seedInk() {
+    splat(0.18, 0.7, 700, -250, 0, 2.6); splat(0.32, 0.35, 500, 420, 1, 2.2);
+    splat(0.78, 0.62, -650, -200, 1, 2.6); splat(0.62, 0.25, -300, 520, 0, 2.0); splat(0.9, 0.3, -500, 300, 0, 1.6);
+  }
+
+  // Pointer: drag (or just move a mouse) through the hero to stir. Ink alternates every 1.2 s of stirring.
+  let last = null, lastInput = -1e9;
+  hero.addEventListener('pointermove', (e) => {
+    if (reduce || paused) return;
+    const r = hero.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = 1 - (e.clientY - r.top) / r.height;
+    const now = performance.now();
+    if (last && now - last.t < 100) {
+      const dx = x - last.x, dy = y - last.y;
+      if (dx * dx + dy * dy > 1e-7) splat(x, y, dx * 6000, dy * 6000, Math.floor(now / 1200) % 2);
+    }
+    last = { x, y, t: now }; lastInput = now;
+  });
+  hero.addEventListener('pointerleave', () => { last = null; });
+
+  let onScreen = true, paused = reduce, raf = 0, prev = 0, ft = 16.7, cpu = 0, dbgOn = false, nextAmbient = 0;
+  const want = () => onScreen && !document.hidden && !paused;
+  const schedule = () => { if (!raf && want()) raf = requestAnimationFrame(frame); };
+  function frame(now) {
+    raf = 0; passes = 0;
+    const c0 = performance.now();
+    const dt = prev ? Math.min((now - prev) / 1000, 1 / 30) : 1 / 60;
+    if (prev) ft += ((now - prev) - ft) * 0.1;
+    prev = now;
+    if (resize()) seedInk();
+    if (now - lastInput > 2500 && now > nextAmbient) { ambient(false); nextAmbient = now + 1400; }
+    step(dt); print();
+    cpu += ((performance.now() - c0) - cpu) * 0.1;
+    if (dbgOn) dbg.textContent = `frame ${ft.toFixed(2)} ms  (${(1000 / ft).toFixed(0)} fps)\ncpu   ${cpu.toFixed(2)} ms\nsim   ${vel.r.w}×${vel.r.h}  dye ${dye.r.w}×${dye.r.h}\nprint ${W}×${Hh}\npasses ${passes} (20 Jacobi)`;
+    schedule();
+  }
+  function still() { if (!resize()) return; seedInk(); for (let i = 0; i < 70; i++) step(1 / 60); print(); }
+
+  if (reduce) { btn.hidden = true; still(); }
+  btn.addEventListener('click', () => { paused = !paused; prev = 0; btn.setAttribute('aria-pressed', String(paused)); btn.textContent = paused ? 'Stir again' : 'Pause ink'; schedule(); });
+  new ResizeObserver(() => { if (reduce) still(); else schedule(); }).observe(hero);
+  new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; prev = 0; schedule(); }).observe(hero);
+  document.addEventListener('visibilitychange', () => { prev = 0; schedule(); });
+  cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); cancelAnimationFrame(raf); fail(); });
+  addEventListener('keydown', (e) => {
+    if (e.key !== '`' || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea, select')) return;
+    dbgOn = !dbgOn; dbg.hidden = !dbgOn; if (dbgOn) dbg.textContent = reduce ? 'reduced motion: one still frame' : 'measuring…';
+  });
+  schedule();
+})();
+</script>
+</body>
+</html>

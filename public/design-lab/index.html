@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Design lab · [LKY]</title>
+<meta name="description" content="Temporary design lab: five graphics-first home page concepts for [LKY]. Not part of the live site.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root { color-scheme: dark; --bg: #0f1012; --card: #17191c; --line: #2c2f34; --text: #ecebe8; --muted: #a6a39d; --key: #f2b66d; }
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+body { background: var(--bg); color: var(--text); font: 400 1rem/1.55 system-ui, -apple-system, 'Segoe UI', sans-serif; padding: clamp(1rem, 4vw, 3rem); overflow-x: clip; }
+a { color: var(--key); text-underline-offset: .2em; }
+:focus-visible { outline: 2px solid var(--key); outline-offset: 3px; }
+header, main { width: min(100%, 76rem); margin-inline: auto; }
+header { display: grid; gap: .75rem; margin-bottom: 2.5rem; }
+.eyebrow { font: 500 .8125rem/1.4 ui-monospace, monospace; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(1.75rem, 1.2rem + 2.4vw, 3rem); line-height: 1.1; letter-spacing: -.02em; }
+header p { color: var(--muted); max-width: 64ch; }
+ol { list-style: none; padding: 0; display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr)); }
+li { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+li:hover, li:focus-within { border-color: var(--key); }
+li:has(a:focus-visible) { outline: 2px solid var(--key); outline-offset: 3px; }
+li img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; display: block; background: #222; }
+.body { padding: 1.125rem 1.25rem 1.25rem; display: grid; gap: .5rem; align-content: start; }
+h2 { font-size: 1.25rem; line-height: 1.25; }
+h2 a { color: var(--text); text-decoration: none; }
+h2 a::after { content: ''; position: absolute; inset: 0; }
+h2 a:focus-visible { outline: none; }
+.idea { color: var(--text); }
+.meta { color: var(--muted); font-size: .875rem; }
+.sw { display: flex; gap: 4px; margin-top: .25rem; }
+.sw span { width: 1.25rem; height: 1.25rem; border-radius: 4px; border: 1px solid rgb(255 255 255 / .15); }
+.rec { font: 600 .75rem/1 ui-monospace, monospace; text-transform: uppercase; letter-spacing: .06em; color: #0f1012; background: var(--key); padding: .3125rem .5rem; border-radius: 4px; justify-self: start; }
+footer { width: min(100%, 76rem); margin: 2.5rem auto 0; color: var(--muted); font-size: .875rem; }
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">[LKY] · design lab · temporary, not indexed</p>
+  <h1>Five graphics-first home pages</h1>
+  <p>Each concept is one self-contained HTML file with a real-time element written in vanilla WebGL2 or Canvas 2D. All product art is placeholder. Press <kbd>`</kbd> on any concept for a frame-time overlay. The full write-up, ranking and recommendation are in <code>Docs/Design/Exploration/Concepts.md</code>.</p>
+</header>
+<main>
+  <ol>
+    <li>
+      <img src="thumbs/concept-1.jpg" alt="" width="640" height="400" loading="lazy">
+      <div class="body">
+        <h2><a href="concept-1.html">1 · Key Light, Relit</a></h2>
+        <p class="idea">The current design, re-angled: a coffered dome relief baked to a G-buffer and relit live by a key light that follows the pointer.</p>
+        <p class="meta">WebGL2 deferred relighting with soft shadows · Archivo + JetBrains Mono</p>
+        <div class="sw" aria-hidden="true"><span style="background:#0b0c0e"></span><span style="background:#121418"></span><span style="background:#edeae4"></span><span style="background:#f2b66d"></span><span style="background:#4a5d7a"></span></div>
+      </div>
+    </li>
+    <li>
+      <img src="thumbs/concept-2.jpg" alt="" width="640" height="400" loading="lazy">
+      <div class="body">
+        <h2><a href="concept-2.html">2 · Viewport</a></h2>
+        <p class="idea">The home page as an engine editor: hierarchy, inspector and a live viewport with seven real debug view modes.</p>
+        <p class="meta">WebGL2 rasterizer, shadow map, wireframe, overdraw · IBM Plex Sans + Plex Mono</p>
+        <div class="sw" aria-hidden="true"><span style="background:#101113"></span><span style="background:#1b1d21"></span><span style="background:#e3e6ea"></span><span style="background:#5ad1c4"></span><span style="background:#ff9a3c"></span></div>
+      </div>
+    </li>
+    <li>
+      <img src="thumbs/concept-3.jpg" alt="" width="640" height="400" loading="lazy">
+      <div class="body">
+        <span class="rec">Recommended</span>
+        <h2><a href="concept-3.html">3 · Converge</a></h2>
+        <p class="idea">High-key Swiss layout around a live path tracer whose white studio cove melts into the page. It converges, then sleeps.</p>
+        <p class="meta">WebGL2 progressive path tracer · Space Grotesk + Space Mono</p>
+        <div class="sw" aria-hidden="true"><span style="background:#e7e5e0"></span><span style="background:#dcd9d2"></span><span style="background:#111111"></span><span style="background:#4a4a48"></span><span style="background:#1d31c9"></span></div>
+      </div>
+    </li>
+    <li>
+      <img src="thumbs/concept-4.jpg" alt="" width="640" height="400" loading="lazy">
+      <div class="body">
+        <h2><a href="concept-4.html">4 · Proceedings</a></h2>
+        <p class="idea">The home page typeset as a graphics paper, with a live space-colonization tree as Figure 1 and real equations.</p>
+        <p class="meta">Canvas 2D procedural growth · Source Serif 4 + Source Sans 3 + STIX Two Math</p>
+        <div class="sw" aria-hidden="true"><span style="background:#fdfcf8"></span><span style="background:#f4f2ec"></span><span style="background:#1a1a1a"></span><span style="background:#5a5753"></span><span style="background:#8b1e1e"></span></div>
+      </div>
+    </li>
+    <li>
+      <img src="thumbs/concept-5.jpg" alt="" width="640" height="400" loading="lazy">
+      <div class="body">
+        <h2><a href="concept-5.html">5 · Stir</a></h2>
+        <p class="idea">A risograph zine around a GPU fluid simulation, printed every frame as a two-ink halftone. Drag through it to stir.</p>
+        <p class="meta">WebGL2 stable fluids + halftone shader · Bricolage Grotesque + DM Mono</p>
+        <div class="sw" aria-hidden="true"><span style="background:#f1ece1"></span><span style="background:#1c1a24"></span><span style="background:#ff48b0"></span><span style="background:#0078bf"></span><span style="background:#3255a4"></span></div>
+      </div>
+    </li>
+  </ol>
+</main>
+<footer>
+  <p>These pages are mockups for choosing a direction. They will be deleted once a concept is picked. <a href="../">Back to the live site</a></p>
+</footer>
+</body>
+</html>
