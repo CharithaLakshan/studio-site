@@ -18,7 +18,9 @@ import thumb1024 from '../assets/hero/thumb-1024.jpg';
 
 const alt =
   'A path-traced render in a white studio: a matte cobalt sphere, a glass sphere, a chrome sphere, a small black sphere and a small white sphere, lit by one soft light.';
-const poster = await getImage({ src: poster1024, widths: [960, 1440, 1920, 2400, 2880], format: 'webp' });
+// Quality 90: the flat studio compresses so well that at 80 the large sizes fall under Chrome's LCP
+// low-entropy cut-off (0.05 bits per shown pixel) and the headline would become the LCP element.
+const poster = await getImage({ src: poster1024, widths: [960, 1440, 1920, 2400, 2880], format: 'webp', quality: 90 });
 // Shown size of the 12:5 poster under object-fit: cover. Phones and portrait screens: a 4:3 frame,
 // 100vw wide, so the picture is 180vw wide. Otherwise the hero is one screen minus the header tall.
 const posterSizes =

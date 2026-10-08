@@ -1,6 +1,6 @@
 # Current State
 
-_Rewritten at the end of every session. Last: 2026-10-08, Stage 3 review, hardening and polish._
+_Rewritten at the end of every session. Last: 2026-10-08, hero redesign (full-bleed render with poster)._
 
 ## What works
 
@@ -13,11 +13,11 @@ _Rewritten at the end of every session. Last: 2026-10-08, Stage 3 review, harden
   - WCAG AA contrast computed for every pair (lowest 6.3:1);
   - `npm run check` 0/0/0, build without warnings.
 - **Positioning:** a product showcase. The portfolio link is wired but hidden until `site.portfolioUrl` is set.
-- **Path-traced hero** (`PathTracer.astro`, `path-tracer.ts`, `path-tracer-hero.ts`):
-  - **Still frame:** offline-rendered by the same code. It shows for first paint, without WebGL2, under reduced motion and **on software WebGL (no GPU)**. The last two offer a "Render it live" button.
-  - **Running:** starts after first paint, pauses off-screen or when the tab is hidden, uses at most 0.55 MP and goes idle at 1024 spp. It re-fits after a resize.
-  - **First screen:** on landscape screens ≥40rem the hero fits the first screen; `viewFor()` frames the spheres for any aspect, and the still matches the live render.
-  - **Focus:** a visible focus frame between the crop marks; the arrow keys move the light.
+- **Hero** (`PathTracer.astro`, `path-tracer.ts`, `path-tracer-hero.ts`), full-bleed since 2026-10-08:
+  - **Opens on a poster:** a 1024 spp pre-render (LCP element). The tracer is a lazy chunk; no WebGL before the visitor clicks Render live or the picture.
+  - **One framing:** poster, 1/16 spp stages and live canvas are all 12:5 (`FRAME`, `BAND`) with the same `object-fit: cover`, so they line up (0 px measured).
+  - **Desktop/laptop** (≥47.5rem, landscape): render fills `100svh` minus the header; headline over the empty studio; bottom bar with counter + status, thumbnails, buttons over a paper fade. **Phones/portrait:** text, 4:3 render, bar.
+  - **Controls:** Render live → Pause → Resume → Render again; Restart while running or paused; thumbnail buttons with `aria-pressed`; light by click/drag/arrows.
 - **Content model:** `price`, `pricingModel`, `plannedStores`, `primaryStore`. Store button verbs follow status and pricing. JSON-LD `Offer` appears only when the price is known.
 - **SEO:**
   - unique titles and descriptions, canonicals, OG and X tags with image width and height;
@@ -25,7 +25,7 @@ _Rewritten at the end of every session. Last: 2026-10-08, Stage 3 review, harden
 - **Brand:** single brand file `src/config/site.ts` (now a plain object, no `as const`). The brand-swap test passed again.
 - **Performance:**
   - CSS inlined, so nothing blocks rendering.
-  - The only script is the hero (13 KB, home only).
+  - The only script on load is the hero wiring (5 KB, home only); the 10 KB path tracer loads on demand.
   - Fonts 55 KB, self-hosted.
 
 ## What's next
@@ -58,8 +58,10 @@ _Rewritten at the end of every session. Last: 2026-10-08, Stage 3 review, harden
 
 ## Known issues / notes
 
-- Path tracer frame times on real GPUs are unmeasured; only SwiftShader is available here. Testing the live render here needs a click on "Render it live" (software WebGL is held back on purpose).
-- Hero stills come from `scripts/render-hero-images.mjs` (slow CPU render). Re-run it after any change to the scene or tone mapping.
+- Path tracer frame times on real GPUs are unmeasured; only SwiftShader is available here.
+- Hero pictures come from `scripts/render-hero-images.mjs` (the poster takes about 45 min on the CPU). Re-run it after any change to the scene, `BAND` or tone mapping.
+- Screens wider than 12:5 get a hero taller than the screen (by design, so the crop never cuts the spheres). Under 36rem tall the hero also grows past the fold.
+- `Docs/Design/Screenshots/home-desktop.jpg` and `home-mobile.jpg` predate the new hero; the new one is in `hero-*.jpg`.
 - If `email` and `socials.github` were both empty, the privacy pages' contact link would be empty. Setting the email closes this.
 - A draft's images are still copied into `dist/_astro/`, though no page links them. This is harmless.
 - `robots.txt` has no effect under `github.io/<repo>/` until a custom domain is set.
