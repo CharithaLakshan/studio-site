@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import { responsive } from '../lib/images';
 import StatusBadge from './StatusBadge.astro';
-import { TYPE_LABELS, productUrl, type Product } from '../lib/products';
+import { TYPE_LABELS, priceLabel, productUrl, type Product } from '../lib/products';
 
 interface Props {
   product: Product;
@@ -12,109 +12,108 @@ const { product, headingLevel: H = 'h3' } = Astro.props;
 const d = product.data;
 ---
 
-<article class="product-card">
-  <div class="product-card-media">
+<article class="card">
+  <div class="card-media">
     <Image
       src={d.heroImage.src}
       alt=""
-      {...responsive(d.heroImage.src, [400, 640, 960], '(min-width: 64rem) 24rem, (min-width: 40rem) 50vw, 100vw')}
+      {...responsive(d.heroImage.src, [400, 640, 960], '(min-width: 64rem) 28rem, (min-width: 40rem) 50vw, 100vw')}
     />
   </div>
-  <div class="product-card-body">
+  <div class="card-body">
     <p class="label">{TYPE_LABELS[d.type].one} · {d.platforms.join(', ')}</p>
-    <H class="product-card-title">
-      <a href={productUrl(product)}>{d.title}</a>
-    </H>
-    <p class="product-card-tagline">{d.tagline}</p>
-    <StatusBadge status={d.status} />
+    <H class="card-title"><a href={productUrl(product)}>{d.title}</a></H>
+    <p class="card-tagline">{d.tagline}</p>
+    <div class="card-meta">
+      <span class="card-price">{priceLabel(d)}</span>
+      <StatusBadge status={d.status} />
+    </div>
   </div>
 </article>
 
 <style>
-  .product-card {
+  /* A printed card: 2px ink border and a hard offset shadow. */
+  .card {
     position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
-    border: 1px solid transparent;
-    border-radius: var(--radius-l);
-    background:
-      linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
-      var(--rim) border-box;
+    border: 2px solid var(--color-ink);
+    background: var(--color-card);
     box-shadow: var(--shadow-card);
-    overflow: hidden;
-    isolation: isolate;
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
   }
 
-  /* Raised light on hover/focus: fades in a brighter rim and a warm pool. */
-  .product-card::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    z-index: -1;
-    border: 1px solid transparent;
-    border-radius: inherit;
-    background:
-      radial-gradient(120% 80% at 85% 0%, var(--light-key), transparent 60%) padding-box,
-      var(--rim-strong) border-box;
-    opacity: 0;
-    transition: opacity var(--dur-base) var(--ease-out);
-    pointer-events: none;
+  .card:hover,
+  .card:focus-within {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-card-hover);
   }
 
-  .product-card:hover::after,
-  .product-card:focus-within::after {
-    opacity: 1;
-  }
-
-  .product-card-media {
+  .card-media {
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: var(--color-raised);
+    border-bottom: 2px solid var(--color-ink);
+    background: var(--color-paper-2);
   }
 
-  .product-card-media :global(img) {
+  .card-media :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .product-card-body {
+  .card-body {
+    flex: 1;
     display: grid;
+    grid-template-rows: auto auto 1fr auto;
     gap: var(--space-2);
-    justify-items: start;
-    padding: var(--space-5);
+    padding: var(--space-4) var(--space-4) var(--space-5);
   }
 
-  .product-card-title {
+  .card-title {
     font-size: var(--step-2);
-    font-stretch: var(--stretch-display);
-    letter-spacing: var(--tracking-display);
   }
 
-  .product-card-title a {
-    color: var(--color-text);
+  .card-title a {
+    color: var(--color-ink);
     text-decoration: none;
   }
 
-  /* Whole card is clickable via the title link. */
-  .product-card-title a::before {
+  /* The whole card is clickable through the title link. */
+  .card-title a::after {
     content: '';
     position: absolute;
     inset: 0;
-    z-index: 1;
   }
 
-  .product-card-title a:focus-visible {
+  .card-title a:focus-visible {
     outline: none;
   }
 
-  .product-card:has(a:focus-visible) {
+  .card:has(a:focus-visible) {
     outline: var(--focus-ring);
-    outline-offset: var(--focus-offset);
+    outline-offset: 6px;
   }
 
-  .product-card-tagline {
-    color: var(--color-text-muted);
+  .card-tagline {
+    color: var(--color-ink-2);
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: var(--rule);
+  }
+
+  .card-price {
+    font-weight: 700;
   }
 </style>

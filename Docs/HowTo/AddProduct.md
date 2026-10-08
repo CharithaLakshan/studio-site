@@ -7,9 +7,9 @@ Field details are in Docs/Architecture/ContentModel.md.
 1. **Pick the slug.** Lowercase kebab-case, short, e.g. `night-signal`. It is **permanent** once published, because store listings will link to `/products/<slug>/`.
 2. **Add the images.** Create `src/assets/products/<slug>/` and put the hero (21:9, ideally 2100×900, PNG/JPG/WebP) and the screenshots (16:9) in it. Astro optimises them at build time. If there are no images yet, copy the placeholder SVGs from `src/assets/products/sample-product/`.
 3. **Create the entry.** Copy `src/content/products/sample-product.md` to `src/content/products/<slug>.md`, or use the template below.
-4. **Fill in the frontmatter.** Use only facts. Anything unknown is left out, or marked with a YAML comment `# TODO(charitha): …`.
-5. **Write the body.** Two to four short paragraphs of Markdown: what it is, who it is for, what makes it different. Do not write the studio name; it comes from the config.
-6. **Store links.** Add a key with `''` for each planned store ("Coming soon"). Replace it with the URL once the store page is live. Omit stores you won't use.
+4. **Fill in the frontmatter.** Use only facts. Anything unknown is left out, or marked with a YAML comment `# TODO(charitha): …`. Set `pricingModel` and `price` only when the price is decided; until then leave `pricingModel: tba` and the page shows "Price TBA".
+5. **Write the body.** Two to four short paragraphs of Markdown, in first person ("I made …"), short sentences: what it is, who it is for, what makes it different. Do not write the studio name; it comes from the config.
+6. **Stores.** List planned stores under `plannedStores` (they show as "Coming soon"). When a store page goes live, add its URL under `storeLinks`; the button becomes live and its label follows the status ("Wishlist on Steam" before release, "Get it on Google Play" or "Buy on Steam" after). Set `primaryStore` if the first button should be a store other than the default order (Steam, Meta Horizon Store, Google Play, itch.io, GitHub, website).
 7. **Privacy policy (if needed).** Google Play and Meta require one. Create `src/content/product-privacy/<slug>.md` with `lastUpdated:` and the policy text, then set `hasPrivacyPolicy: true`. Give the stores the URL `…/products/<slug>/privacy/`.
 8. **Preview it.** Keep `draft: true` while working. To see the page, set `draft: false` locally and run `npm run dev`.
 9. **Check.** Run `npm run check && npm run build`. Both must pass with no warnings.
@@ -27,6 +27,8 @@ summary: One or two sentences, under 200 characters.
 status: in-development # concept | in-development | early-access | released
 platforms: # Windows PC VR | Meta Quest | Android | Windows | Web
   - Windows
+pricingModel: tba # free | paid | free-with-in-app-purchases | tba
+# price: '$4.99'                # shown as written; only when decided
 features:
   - Key feature, one sentence.
 featured: false
@@ -39,8 +41,10 @@ screenshots:
   - src: ../../assets/products/product-name/shot-1.png
     alt: Describe what the screenshot shows.
 # trailerYouTubeId: dQw4w9WgXcQ   # 11-character ID only
-storeLinks: # URL = live, '' = Coming soon, omit = hidden
-  steam: ''
+storeLinks: {} # live store pages, e.g. steam: https://store.steampowered.com/app/...
+plannedStores: # shown as "Coming soon" until a URL is added above
+  - steam
+# primaryStore: steam             # optional: the live store that gets the big first button
 # systemRequirements:
 #   minimum:
 #     OS: Windows 10 64-bit
@@ -57,4 +61,5 @@ Long description here.
 
 - Everything except `slug` can change at any time.
 - To retire a product, keep the page and set `status`, or ask first before removing it. Removing it breaks store links.
-- New platform values go into `PLATFORMS` in `src/content.config.ts` first.
+- New platform values go into `PLATFORMS` in `src/content.config.ts` first, plus a short heading in `PLATFORM_GROUP_LABELS` (`src/lib/products.ts`).
+- When a store page goes live, move the store from `plannedStores` to `storeLinks` with its URL. When the product releases, change `status`; the button labels follow.

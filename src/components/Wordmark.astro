@@ -1,26 +1,46 @@
 ---
 import { site } from '../config/site';
 
-// Punctuation in the name (e.g. brackets) is dimmed; letters stay bright. Works for any name.
-const parts = [...site.name].map((ch) => ({ ch, mark: !/[\p{L}\p{N}\s]/u.test(ch) }));
+interface Props {
+  /** Paper-coloured glyphs for the ink footer. */
+  inverse?: boolean;
+}
+const { inverse = false } = Astro.props;
+
+// Two-ink print: ink glyphs over a cobalt impression that is slightly out of register.
+// Each glyph gets a marginally different offset, like a hand-pulled print. Works for any name.
+const OFFSETS = [
+  [0.06, 0.045],
+  [0.07, 0.05],
+  [0.055, 0.06],
+  [0.066, 0.04],
+  [0.06, 0.056],
+];
+const glyphs = [...site.name].map((ch, i) => ({ ch, off: OFFSETS[i % OFFSETS.length]! }));
 ---
 
-<span class="wordmark">
-  {parts.map(({ ch, mark }) => (mark ? <span class="wordmark-mark">{ch}</span> : ch))}
+<span class:list={['wordmark', { 'wordmark--inverse': inverse }]}>
+  {glyphs.map(({ ch, off }) => <span style={`--dx:${off[0]}em;--dy:${off[1]}em`}>{ch}</span>)}
 </span>
 
 <style>
   .wordmark {
     font-family: var(--font-sans);
-    font-stretch: 125%;
     font-weight: 700;
-    letter-spacing: 0.04em;
-    color: var(--color-text);
+    letter-spacing: 0.01em;
+    color: var(--color-ink);
     white-space: nowrap;
   }
 
-  .wordmark-mark {
-    color: var(--color-key);
-    font-weight: 400;
+  .wordmark > span {
+    text-shadow: var(--dx) var(--dy) 0 var(--color-blue);
+  }
+
+  .wordmark--inverse {
+    color: var(--color-paper);
+  }
+
+  .wordmark--inverse > span {
+    text-shadow: var(--dx) var(--dy) 0 var(--color-blue);
   }
 </style>

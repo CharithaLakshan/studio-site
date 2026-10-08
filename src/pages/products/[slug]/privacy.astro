@@ -25,19 +25,19 @@ const title = `${product.data.title} privacy policy`;
 ---
 
 <BaseLayout title={title} description={`How ${product.data.title} by ${site.name} handles your data.`}>
-  <PageHeader title={title} label={`${product.data.title} · ${site.name}`}>
-    <p class="label">
+  <PageHeader title="Privacy policy" label={`${product.data.title} · ${site.name}`}>
+    <p class="label muted">
       Last updated <time datetime={policy.data.lastUpdated.toISOString().slice(0, 10)}>
         {formatDate(policy.data.lastUpdated)}
       </time>
     </p>
   </PageHeader>
-  <div class="container">
+  <div class="container page-body">
     <div class="prose">
       <Content />
       <h2>Who is responsible</h2>
       <p>
-        {product.data.title} is made by {site.name}, the studio of {site.owner.name}.
+        {product.data.title} is made by {site.name}, the one-person studio of {site.owner.name}.{' '}
         {
           site.email ? (
             <>
@@ -50,7 +50,13 @@ const title = `${product.data.title} privacy policy`;
           )
         }
       </p>
-      <p><a href={productUrl(product)}>Back to {product.data.title}</a></p>
+      <p><a class="button" href={productUrl(product)}>← Back to {product.data.title}</a></p>
     </div>
   </div>
 </BaseLayout>
+
+<style>
+  .page-body {
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+</style>

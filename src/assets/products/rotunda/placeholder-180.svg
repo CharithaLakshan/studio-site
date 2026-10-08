@@ -1,14 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900"><defs>
-    <radialGradient id="key" cx="0.5" cy="0.3" r="0.65">
-      <stop offset="0" stop-color="#f2b66d" stop-opacity="0.5"/>
-      <stop offset="0.45" stop-color="#f2b66d" stop-opacity="0.12"/>
-      <stop offset="1" stop-color="#f2b66d" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="fill" cx="0.12" cy="0.95" r="0.7">
-      <stop offset="0" stop-color="#4a5d7a" stop-opacity="0.5"/>
-      <stop offset="1" stop-color="#4a5d7a" stop-opacity="0"/>
-    </radialGradient>
-  </defs><rect width="1600" height="900" fill="#0b0c0e"/><rect width="1600" height="900" fill="url(#fill)"/><rect width="1600" height="900" fill="url(#key)"/><g fill="none" stroke="#edeae4"><path d="M280 700 A 520 520 0 0 1 1320 700" stroke-opacity="0.5" stroke-width="2"/><path d="M280 700 A 86.66666666666667 520 0 0 1 1320 700" stroke-opacity="0.12"/><path d="M280 700 A 173.33333333333334 520 0 0 1 1320 700" stroke-opacity="0.12"/><path d="M280 700 A 260 520 0 0 1 1320 700" stroke-opacity="0.12"/><path d="M280 700 A 346.6666666666667 520 0 0 1 1320 700" stroke-opacity="0.12"/><path d="M280 700 A 433.3333333333333 520 0 0 1 1320 700" stroke-opacity="0.12"/><path d="M296.5121649930358 570 L 1303.4878350069641 570" stroke-opacity="0.12"/><path d="M349.6667900320919 440 L 1250.333209967908 440" stroke-opacity="0.12"/><path d="M456.0523295616032 310 L 1143.947670438397 310" stroke-opacity="0.12"/><line x1="220" y1="700" x2="1380" y2="700" stroke-opacity="0.3"/></g><g font-family="ui-monospace, Menlo, Consolas, monospace" font-size="26" letter-spacing="3" fill="#edeae4">
-    <rect x="38" y="810" width="388.8" height="58" rx="6" fill="#0b0c0e" fill-opacity="0.72" stroke="#f2b66d" stroke-opacity="0.6"/>
-    <text x="56" y="850">PLACEHOLDER · 180°</text>
-  </g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900"><rect width="1600" height="900" fill="#dcd9d2"/><g fill="none" stroke="#111111" stroke-width="1.5"><path d="M280 640 A520 468 0 0 1 1320 640" stroke-width="2"/><path d="M380 640 A420 378 0 0 1 1220 640" stroke-width="1.5"/><path d="M480 640 A320 288 0 0 1 1120 640" stroke-width="1.5"/><path d="M580 640 A220 198 0 0 1 1020 640" stroke-width="1.5"/><path d="M680 640 A120 108 0 0 1 920 640" stroke-width="1.5"/><ellipse cx="800" cy="640" rx="520" ry="114" stroke-dasharray="8 8"/><path d="M800 172 Q 620.0 380 488.0 640" /><path d="M800 172 Q 710.0 380 644.0 640" /><path d="M800 172 Q 890.0 380 956.0 640" /><path d="M800 172 Q 980.0 380 1112.0 640" /></g><line x1="180" y1="640" x2="1420" y2="640" stroke="#1d31c9" stroke-width="4"/><g font-family="Space Mono, ui-monospace, Menlo, Consolas, monospace" font-size="26" font-weight="700" letter-spacing="2"><rect x="50" y="50" width="375" height="57" fill="#111111"/><text x="70" y="88" fill="#e7e5e0">PLACEHOLDER · 180°</text></g></svg>

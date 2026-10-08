@@ -1,3 +1,5 @@
+> **Superseded.** Key Light (below) was the Stage 2 design. The final design is Converge (Docs/Design/DesignSystem.md), chosen on 2026-10-08 after the exploration in Docs/Design/Exploration/Concepts.md.
+
 # Design Directions
 
 Stage 1, Step A. Three different visual directions for the [LKY] studio site. Pick one, or mix parts. Nothing here is built yet.

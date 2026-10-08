@@ -1,84 +1,83 @@
 ---
-import { STORES, type Product } from '../lib/products';
+import { storeButtons, type Product } from '../lib/products';
 
 interface Props {
-  links: Product['data']['storeLinks'];
+  product: Product;
+  /** "stack": full-width column (buy box). "row": wrapping row (featured card). */
+  layout?: 'stack' | 'row';
 }
-const { links } = Astro.props;
-const stores = STORES.filter(([key]) => links[key] !== undefined).map(([key, name]) => ({
-  name,
-  href: links[key] ?? '',
-}));
+const { product, layout = 'stack' } = Astro.props;
+const buttons = storeButtons(product.data);
+const hasPlanned = buttons.some((b) => !b.href);
 ---
 
 {
-  stores.length > 0 && (
-    <ul class="store-buttons" role="list">
-      {stores.map((s) => (
-        <li>
-          {s.href ? (
-            <a class="store-button" href={s.href} rel="noopener">
-              <span class="store-button-name">{s.name}</span>
-              <span class="store-button-note">
-                Open store page <span aria-hidden="true">↗</span>
+  buttons.length > 0 && (
+    <div class:list={['stores', `stores--${layout}`]}>
+      <ul role="list">
+        {buttons.map((b) => (
+          <li>
+            {b.href ? (
+              <a class:list={['button', { 'button--primary': b.primary }]} href={b.href} rel="noopener">
+                {b.label} <span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <span class="button button--soon">
+                {b.name}
+                <span class="visually-hidden">, </span>
+                <span class="soon">Coming soon</span>
               </span>
-            </a>
-          ) : (
-            <span class="store-button" aria-disabled="true">
-              <span class="store-button-name">{s.name}</span>
-              <span class="store-button-note">Coming soon</span>
-            </span>
-          )}
-        </li>
-      ))}
-    </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+      {hasPlanned && layout === 'stack' && (
+        <p class="stores-note">“Coming soon” marks stores I plan to release on. The button goes live when the store page does.</p>
+      )}
+    </div>
   )
 }
 
 <style>
-  .store-buttons {
-    display: grid;
+  .stores ul {
+    display: flex;
+    flex-wrap: wrap;
     gap: var(--space-3);
     padding: 0;
     list-style: none;
   }
 
-  .store-button {
-    display: flex;
-    align-items: baseline;
+  .stores--stack ul {
+    flex-direction: column;
+  }
+
+  .stores--stack .button {
+    width: 100%;
     justify-content: space-between;
+    min-height: 3.25rem;
+  }
+
+  /* Planned store: plain text in a dashed outline, muted (7:1), no hover, not focusable. */
+  .button--soon {
     gap: var(--space-3);
-    min-height: 3rem;
-    padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--color-key);
-    border-radius: var(--radius-m);
-    background: var(--color-key);
-    color: var(--color-on-key);
-    text-decoration: none;
-    transition: box-shadow var(--dur-base) var(--ease-out);
-  }
-
-  a.store-button:hover {
-    box-shadow: 0 0 2rem -0.25rem rgb(242 182 109 / 0.5);
-  }
-
-  .store-button-name {
-    font-weight: 650;
-  }
-
-  .store-button-note {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-  }
-
-  /* Disabled: unlit. Dashed outline, muted but still readable (AA). */
-  .store-button[aria-disabled='true'] {
     border-style: dashed;
-    border-color: var(--color-line-strong);
-    background: transparent;
-    color: var(--color-text-muted);
+    border-color: var(--color-ink-2);
+    color: var(--color-ink-2);
     cursor: default;
+  }
+
+  .button--soon:hover {
+    background: transparent;
+    color: var(--color-ink-2);
+  }
+
+  .soon {
+    font-weight: 400;
+  }
+
+  .stores-note {
+    margin-top: var(--space-3);
+    font-size: var(--step--1);
+    color: var(--color-ink-2);
   }
 </style>

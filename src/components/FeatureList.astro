@@ -1,4 +1,6 @@
 ---
+import { pad2 } from '../lib/products';
+
 interface Props {
   features: string[];
 }
@@ -9,9 +11,7 @@ const { features } = Astro.props;
   {
     features.map((f, i) => (
       <li>
-        <span class="feature-index" aria-hidden="true">
-          {String(i + 1).padStart(2, '0')}
-        </span>
+        <span class="feature-index" aria-hidden="true">{pad2(i + 1)}</span>
         <span>{f}</span>
       </li>
     ))
@@ -20,25 +20,26 @@ const { features } = Astro.props;
 
 <style>
   .feature-list {
-    display: grid;
-    gap: 0;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--color-line);
+    border-top: var(--rule);
   }
 
   .feature-list li {
     display: grid;
-    grid-template-columns: 3rem 1fr;
+    grid-template-columns: 3.5rem 1fr;
     gap: var(--space-3);
+    align-items: baseline;
     padding-block: var(--space-4);
-    border-bottom: 1px solid var(--color-line);
+    border-bottom: var(--rule);
+    font-size: var(--step-1);
+    line-height: 1.35;
   }
 
   .feature-index {
     font-family: var(--font-mono);
     font-size: var(--step--1);
-    line-height: 2;
-    color: var(--color-key);
+    font-weight: 700;
+    color: var(--color-blue);
   }
 </style>

@@ -2,29 +2,30 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import ProductGrid from '../../components/ProductGrid.astro';
-import { PRODUCT_TYPES } from '../../content.config';
+import Section from '../../components/Section.astro';
 import { site } from '../../config/site';
-import { TYPE_LABELS, getProducts } from '../../lib/products';
+import { getProducts, groupByPlatform } from '../../lib/products';
 
 const products = await getProducts();
-const groups = PRODUCT_TYPES.map((type) => ({
-  type,
-  label: TYPE_LABELS[type].many,
-  items: products.filter((p) => p.data.type === type),
-})).filter((g) => g.items.length > 0);
-const description = `Every game, app, tool and experience from ${site.name}, grouped by type.`;
+const groups = groupByPlatform(products);
+const count = (k: number) => `${k} product${k === 1 ? '' : 's'}`;
+const description = `Every game, VR app and tool from ${site.name}, grouped by platform, with prices and store links.`;
 ---
 
 <BaseLayout title="Products" description={description}>
-  <PageHeader title="Products" lede={description}>
+  <PageHeader
+    title="Products"
+    label={count(products.length)}
+    lede="Everything I make, grouped by platform. If something runs on two platforms, it’s listed under both."
+  >
     {
       groups.length > 1 && (
-        <nav aria-label="Product types">
-          <ul class="type-nav" role="list">
+        <nav aria-label="Platforms">
+          <ul class="platform-nav" role="list">
             {groups.map((g) => (
               <li>
-                <a href={`#${g.type}`}>
-                  {g.label} <span class="label">{g.items.length}</span>
+                <a class="button" href={`#${g.id}`}>
+                  {g.label} <span aria-hidden="true">·</span> {g.items.length}
                 </a>
               </li>
             ))}
@@ -35,29 +36,20 @@ const description = `Every game, app, tool and experience from ${site.name}, gro
   </PageHeader>
 
   {
-    groups.map((g) => (
-      <section class="section container" id={g.type} aria-labelledby={`${g.type}-title`}>
-        <div class="section-head">
-          <h2 id={`${g.type}-title`}>{g.label}</h2>
-          <span class="label">{g.items.length}</span>
-        </div>
+    groups.map((g, i) => (
+      <Section n={i + 1} label={count(g.items.length)} title={g.label} id={g.id}>
         <ProductGrid products={g.items} />
-      </section>
+      </Section>
     ))
   }
 </BaseLayout>
 
 <style>
-  .type-nav {
+  .platform-nav {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2) var(--space-5);
+    gap: var(--space-2);
     padding: 0;
     list-style: none;
-  }
-
-  .type-nav a {
-    display: inline-block;
-    padding-block: var(--space-2);
   }
 </style>

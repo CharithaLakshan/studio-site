@@ -1,16 +1,17 @@
 ---
 interface Props {
   title: string;
+  /** Small mono kicker above the title. */
   label?: string;
   lede?: string;
 }
 const { title, label, lede } = Astro.props;
 ---
 
-<header class="page-header light-field">
-  <div class="container">
+<header class="page-header">
+  <div class="container page-header-inner">
     {label && <p class="label">{label}</p>}
-    <h1>{title}</h1>
+    <h1 class="display">{title}</h1>
     {lede && <p class="lede">{lede}</p>}
     <slot />
   </div>
@@ -18,16 +19,13 @@ const { title, label, lede } = Astro.props;
 
 <style>
   .page-header {
-    padding-block: var(--space-8) var(--space-6);
+    border-bottom: var(--rule-thick);
   }
 
-  .page-header .container {
+  .page-header-inner {
     display: grid;
-    gap: var(--space-3);
+    gap: var(--space-4);
     justify-items: start;
-  }
-
-  .lede {
-    max-width: 40rem;
+    padding-block: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 3rem);
   }
 </style>

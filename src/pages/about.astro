@@ -6,50 +6,50 @@ import { site } from '../config/site';
 import { url } from '../lib/url';
 
 const { owner } = site;
-// TODO(charitha): keep the study line below current after graduation.
+const portfolio = site.portfolioUrl as string;
 ---
 
-<BaseLayout title="About" description={`About ${site.name} and ${owner.name}, the person behind it.`}>
-  <PageHeader title="About" label={site.name} lede={site.intro} />
+<BaseLayout title="About" description={`${site.name} is the one-person studio of ${owner.name}. This site lists the products.`}>
+  <PageHeader title="About" label={site.name} />
 
   <div class="container about">
-    <section class="prose" aria-labelledby="studio-title">
-      <h2 id="studio-title">The studio</h2>
+    <div class="prose">
       <p>
-        {site.name} makes games, VR apps, tools and real-time experiences. Every product has its own
-        page on this site, with links to the stores where you can get it.
+        {site.name} is my one-person studio. I’m {owner.name}, “{owner.alias}” online, and I live in {owner.location}.
       </p>
-      <p><a href={url('products/')}>See all products</a></p>
-    </section>
-
-    <section class="prose" aria-labelledby="person-title">
-      <h2 id="person-title">The person behind it</h2>
       <p>
-        <strong>{owner.name}</strong>, known online as {owner.alias}. {owner.role}, working in
-        real-time graphics and XR, based in {owner.location}.
+        I make games, VR apps and tools. Some are free and some are paid. Each one has a page here with its price,
+        its platforms and a link to the store where you can get it.
       </p>
-      <p>Final-year Computer Science undergraduate at the University of Colombo School of Computing.</p>
       <p>
-        Works with Unity, Unreal Engine 5 and Blender, writing C, C++, C#, Python and CUDA. Interested in
-        real-time rendering, procedural generation, VR/XR and game development.
+        This site is only about the products.{' '}
+        {
+          portfolio ? (
+            <>
+              My background, projects and research are on <a href={portfolio} rel="me noopener">my portfolio</a>.
+            </>
+          ) : (
+            <>See the links below for what else I do.</>
+          )
+        }
       </p>
-    </section>
-
-    <section aria-labelledby="links-title">
-      <h2 id="links-title">Find me</h2>
+      <p><a class="button button--primary" href={url('products/')}>See the products <span class="button-arrow" aria-hidden="true">→</span></a></p>
+    </div>
+    <nav aria-label="Elsewhere">
       <SocialLinks />
-    </section>
+    </nav>
   </div>
 </BaseLayout>
 
 <style>
   .about {
     display: grid;
-    gap: var(--space-8);
-    padding-top: var(--space-5);
+    gap: var(--space-6);
+    padding-block: clamp(2rem, 5vw, 4rem);
   }
 
-  .about h2 {
-    margin-bottom: var(--space-4);
+  .about .prose {
+    font-size: var(--step-1);
+    line-height: 1.45;
   }
 </style>

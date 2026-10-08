@@ -4,26 +4,29 @@
  * Nothing else in src/ may contain the studio name, owner name, email or social URLs.
  */
 
+const name = '[LKY]';
+
 export const site = {
   /** Studio name, rendered as the text wordmark. */
-  name: '[LKY]',
-  /** Short line used in the home hero, default meta description and the footer. */
-  // TODO(charitha): confirm or replace the tagline.
-  tagline: 'Real-time graphics and immersive experiences.',
-  /** One or two sentences about the studio. Used on Home and About. */
-  intro:
-    'A one-person studio from Sri Lanka making games, VR apps, tools and real-time experiences, with a focus on rendering, light and immersion.',
+  name,
+  /** Home hero headline (h1). First person, short. */
+  headline: 'I make things to play, watch and use.',
+  /** One line under the headline. Also the default meta description, home title and footer line. */
+  tagline: 'Games, VR apps and tools, made by one person in Sri Lanka.',
 
   owner: {
     name: 'M. Charitha Lakshan',
     alias: 'Lucky',
-    role: 'Immersive Experience Engineer',
     location: 'Sri Lanka',
   },
 
   /** Public contact email. Leave empty to hide every email link. */
   // TODO(charitha): add the public contact email for the studio.
   email: '',
+
+  /** Personal portfolio (background, projects, research). Leave empty to hide every portfolio link. */
+  // TODO(charitha): paste the portfolio URL, e.g. 'https://example.com'.
+  portfolioUrl: '',
 
   /** Social links. Empty string hides the link. */
   socials: {
@@ -35,9 +38,10 @@ export const site = {
   url: 'https://charithalakshan.github.io',
   base: '/studio-site',
 
-  /** Default social share image, path inside public/. 1200x630 PNG. */
-  defaultSocialImage: 'og-default.png',
-  defaultSocialImageAlt: 'Abstract warm light falling across a dark curved surface.',
+  /** Default social image, path inside public/. 1200x630 JPEG, no text. */
+  defaultSocialImage: 'og-default.jpg',
+  defaultSocialImageAlt:
+    'A path-traced render of a cobalt sphere, a glass sphere, a chrome sphere and a small black sphere in a white studio.',
 
   /** Language and locale for <html lang> and Open Graph. */
   lang: 'en',

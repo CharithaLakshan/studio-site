@@ -1,16 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900"><defs>
-    <radialGradient id="key" cx="0.5" cy="0.4" r="0.65">
-      <stop offset="0" stop-color="#f2b66d" stop-opacity="0.5"/>
-      <stop offset="0.45" stop-color="#f2b66d" stop-opacity="0.12"/>
-      <stop offset="1" stop-color="#f2b66d" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="fill" cx="0.12" cy="0.95" r="0.7">
-      <stop offset="0" stop-color="#4a5d7a" stop-opacity="0.5"/>
-      <stop offset="1" stop-color="#4a5d7a" stop-opacity="0"/>
-    </radialGradient>
-  </defs><rect width="1600" height="900" fill="#0b0c0e"/><rect width="1600" height="900" fill="url(#fill)"/><rect width="1600" height="900" fill="url(#key)"/><g><rect x="351.99999999999994" y="177.99999999999997" width="896.0000000000001" height="504.00000000000006" rx="10" fill="#1a1d22" stroke="#f2b66d" stroke-opacity="0.55" stroke-width="2"/>
-    <rect x="351.99999999999994" y="177.99999999999997" width="896.0000000000001" height="504.00000000000006" rx="10" fill="url(#key)" opacity="0.6"/>
-    <ellipse cx="800" cy="752" rx="403.20000000000005" ry="18" fill="#f2b66d" fill-opacity="0.06"/></g><g font-family="ui-monospace, Menlo, Consolas, monospace" font-size="26" letter-spacing="3" fill="#edeae4">
-    <rect x="38" y="810" width="388.8" height="58" rx="6" fill="#0b0c0e" fill-opacity="0.72" stroke="#f2b66d" stroke-opacity="0.6"/>
-    <text x="56" y="850">PLACEHOLDER · FLAT</text>
-  </g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900"><rect width="1600" height="900" fill="#dcd9d2"/><g fill="none" stroke="#111111" stroke-opacity=".4"><line x1="800" y1="430" x2="-800" y2="900"/><line x1="800" y1="430" x2="-600" y2="900"/><line x1="800" y1="430" x2="-400" y2="900"/><line x1="800" y1="430" x2="-200" y2="900"/><line x1="800" y1="430" x2="0" y2="900"/><line x1="800" y1="430" x2="200" y2="900"/><line x1="800" y1="430" x2="400" y2="900"/><line x1="800" y1="430" x2="600" y2="900"/><line x1="800" y1="430" x2="800" y2="900"/><line x1="800" y1="430" x2="1000" y2="900"/><line x1="800" y1="430" x2="1200" y2="900"/><line x1="800" y1="430" x2="1400" y2="900"/><line x1="800" y1="430" x2="1600" y2="900"/><line x1="800" y1="430" x2="1800" y2="900"/><line x1="800" y1="430" x2="2000" y2="900"/><line x1="800" y1="430" x2="2200" y2="900"/><line x1="800" y1="430" x2="2400" y2="900"/><line x1="0" y1="470" x2="1600" y2="470"/><line x1="0" y1="520" x2="1600" y2="520"/><line x1="0" y1="590" x2="1600" y2="590"/><line x1="0" y1="690" x2="1600" y2="690"/><line x1="0" y1="840" x2="1600" y2="840"/></g><rect x="450" y="170" width="700" height="394" fill="#e7e5e0" stroke="#111111" stroke-width="4"/><line x1="450" y1="367" x2="1150" y2="367" stroke="#1d31c9" stroke-width="4"/><g font-family="Space Mono, ui-monospace, Menlo, Consolas, monospace" font-size="26" font-weight="700" letter-spacing="2"><rect x="50" y="50" width="375" height="57" fill="#111111"/><text x="70" y="88" fill="#e7e5e0">PLACEHOLDER · FLAT</text></g></svg>

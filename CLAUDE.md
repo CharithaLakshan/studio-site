@@ -4,9 +4,9 @@
 
 ## Project
 
-Official website of the one-person indie studio **[LKY]** (temporary name) run by M. Charitha Lakshan ("Lucky"), an Immersive Experience Engineer (real-time graphics and XR). It lists every product (games, VR apps, tools, experiences), each with a permanent page at `/products/<slug>/`. Store listings (Steam, Meta Horizon, Google Play) link to those pages, and each page links out to the stores. The first product is **Rotunda**, a PC VR video player.
+Official website of the one-person indie studio **[LKY]** (temporary name) run by M. Charitha Lakshan ("Lucky"). It is a **product showcase**: every product (games, VR apps, tools, experiences) has a permanent storefront page at `/products/<slug>/` with price, platforms and store buttons. Store listings (Steam, Meta Horizon, Google Play, itch.io) link to those pages. Background, projects and research live on a separate portfolio site, which this site only links to (`site.portfolioUrl`). No Lab or Research content here. The first product is **Rotunda**, a PC VR video player.
 
-Design direction: **Key Light**. Dark, cinematic, one warm key light (`#f2b66d`) on near-black. Spec: `Docs/Design/DesignSystem.md`.
+Design: **Converge** (final). Warm paper `#e7e5e0`, black ink, one cobalt accent `#1d31c9`, Swiss grid with a numbered rail, live path-traced hero, two-ink wordmark, hard offset print shadows used sparingly. Copy: first person, short sentences, no stock marketing words. Spec: `Docs/Design/DesignSystem.md`.
 
 ## Stack
 
@@ -25,17 +25,19 @@ npm run preview
 ## Folder map
 
 ```
-src/config/site.ts         ALL brand/identity values + site URL + base path
+src/config/site.ts         ALL brand/identity values (name, headline, tagline, owner, email, portfolioUrl, socials) + URL + base
 src/content.config.ts      Zod schemas (products, productPrivacy)
 src/content/products/      <slug>.md per product (sample-product.md = draft template)
 src/content/product-privacy/  optional <slug>.md privacy policies
-src/assets/                fonts, product images, blue-noise dither
+src/assets/                fonts (Space Grotesk, Space Mono), hero stills, product images, paper grain
 src/styles/                tokens.css, global.css
 src/layouts/BaseLayout.astro   SEO head + header/main/footer
 src/components/            UI components
-src/lib/                   url.ts, products.ts, seo.ts, images.ts
+src/lib/                   url.ts, products.ts (prices, store buttons, platform groups), seo.ts, images.ts
+src/scripts/               path-tracer.ts (WebGL2 renderer), path-tracer-hero.ts (hero wiring)
 src/pages/                 index, products/, products/[slug]/, about, privacy, 404, robots.txt
-public/                    favicon, apple-touch-icon, og-default.png (no text in any)
+public/                    favicon, apple-touch-icon, og-default.jpg (no text in any)
+scripts/                   render-hero-images.mjs (re-renders hero stills + og image)
 .github/workflows/deploy.yml
 Docs/                      brief, design, architecture, how-tos, roadmap
 ClaudeMemory/              session memory (see below)
@@ -50,7 +52,7 @@ ClaudeMemory/              session memory (see below)
 
 **Tech**
 - Static output, no backend, CMS, database, analytics or cookies.
-- No CSS or UI framework. Zero client JS by default; small vanilla scripts only (nav, trailer).
+- No CSS or UI framework. Zero client JS by default; small vanilla scripts only (hero path tracer, trailer).
 - Self-hosted open-licence fonts. Images through `astro:assets`.
 - Internal links via `url()` from `src/lib/url.ts` (base path). Absolute URLs via `absolute()`.
 - Pages get products only through `src/lib/products.ts` (drafts are filtered there).
@@ -74,5 +76,5 @@ ClaudeMemory/              session memory (see below)
 - `Docs/00-ProjectBrief.md`: master brief (source of truth)
 - `Docs/Design/DesignSystem.md`, `PageSpecs.md`, `DesignDirections.md`
 - `Docs/Architecture/Architecture.md`, `ContentModel.md`
-- `Docs/HowTo/LocalDev.md`, `Deploy.md`, `AddProduct.md`, `RenameBrand.md`
+- `Docs/HowTo/LocalDev.md`, `Deploy.md`, `AddProduct.md`, `RenameBrand.md`, `RenderHeroImages.md`
 - `Docs/Roadmap.md`
