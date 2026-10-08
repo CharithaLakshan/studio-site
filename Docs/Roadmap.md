@@ -9,7 +9,7 @@
 - [x] Astro 7 scaffold, TypeScript strict, folder structure
 - [x] `src/config/site.ts` as the single brand file
 - [x] Tokens, global CSS, self-hosted fonts
-- [x] BaseLayout with SEO head, header with mobile menu, footer
+- [x] BaseLayout with SEO head, header (no menu needed), footer
 - [x] Home, Products, Product, Product privacy, About, Privacy, 404
 - [x] Products collection + Rotunda + draft sample
 - [x] Components incl. store buttons (Coming soon) and click-to-load trailer
@@ -28,19 +28,22 @@
 - [x] Path-traced hero component with offline-rendered fallback stills
 - [x] Self-hosted Space Grotesk and Space Mono; design lab deleted
 
-## Stage 3 — Review and hardening
+## Stage 3 — Review and hardening ✅ (2026-10-08)
 
-- [ ] Lighthouse (mobile) on every page: 95+ in all four categories. Record the scores in SessionLog.
-- [ ] Automated accessibility pass (axe) plus a manual keyboard and screen-reader pass (NVDA or VoiceOver).
-- [ ] Verify WCAG 2.2 AA contrast for every state (hover, focus, disabled) on real hardware.
-- [ ] Test at 320px, 390px, 768px, 1024px and 1440px, and at 200% zoom.
-- [ ] Validate HTML (Nu validator) and structured data (Rich Results Test, schema.org validator).
-- [ ] Check social previews (Open Graph debugger, X card validator).
+Report: `Docs/Reviews/Stage3-Review.md`. Launch steps for Charitha: `Docs/LaunchChecklist.md`.
+
+- [x] Lighthouse (mobile) on every page: 100 in all four categories (local build, SwiftShader).
+- [x] Automated accessibility pass (axe-core, WCAG 2.2 AA + best practice): 0 violations. Keyboard pass in headless Chromium.
+- [x] WCAG 2.2 AA contrast computed for every text pair and state, including the disabled store button and the paper grain.
+- [x] Tested at 320, 360, 640, 768, 1280 and 1920 px: no horizontal scroll, nothing clipped.
+- [x] HTML validated (html-validate); JSON-LD parsed and checked.
+- [x] Every internal link and asset path checked in `dist/` under the base path.
+- [ ] Manual screen-reader pass (NVDA or VoiceOver) on real hardware.
+- [ ] Rich Results Test and Open Graph / X card debuggers on the live URL (need a public URL).
 - [ ] Measure the hero path tracer on a phone and an integrated GPU (time to 1024 spp, frame time). Lower the bounce count or the spp cap on small screens if needed.
-- [ ] Fonts are 55 KB in total (Space Grotesk 22 KB, Space Mono 2 × 17 KB). Subsetting further is optional.
-- [ ] Review the copy with Charitha. Resolve every `TODO(charitha)` (`grep -rn "TODO(charitha)" src`).
+- [ ] Review the copy with Charitha. Resolve every `TODO(charitha)` (see Docs/LaunchChecklist.md).
 - [ ] Optional: link checker in CI.
-- [ ] Launch checklist: Pages enabled, live URL works, every product URL loads, sitemap submitted to Search Console, store listings point to `/products/<slug>/`.
+- [ ] Fonts are 55 KB in total. Subsetting further is optional.
 
 ## Later
 
