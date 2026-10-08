@@ -148,6 +148,11 @@ a:hover {
   padding-inline: var(--gutter);
 }
 
+/* Body of a page that opens with a PageHeader (policies). */
+.page-body {
+  padding-block: clamp(2rem, 5vw, 4rem);
+}
+
 /* Numbered section: a rail (big number + label) beside the content. */
 .section {
   padding-block: clamp(2.5rem, 6vw, 5rem);

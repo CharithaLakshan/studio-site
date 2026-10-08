@@ -31,7 +31,7 @@ const jsonLd = productJsonLd(product, absolute(Astro.url.pathname), image);
 let n = 0;
 ---
 
-<BaseLayout title={`${d.title}: ${d.tagline}`} description={d.summary} image={image} jsonLd={jsonLd}>
+<BaseLayout title={`${d.title}: ${d.tagline.replace(/[.!]$/, '')}`} description={d.summary} image={image} jsonLd={jsonLd}>
   <article class="product">
     <header class="container product-head">
       <a class="label back-link" href={url('products/')}>← All products</a>
@@ -40,30 +40,32 @@ let n = 0;
       <p class="lede">{d.tagline}</p>
     </header>
 
-    <div class="container storefront">
-      <div class="storefront-media">
-        <Image
-          src={d.heroImage.src}
-          alt={d.heroImage.alt}
-          {...responsive(d.heroImage.src, [640, 1024, 1600, 2100], '(min-width: 64rem) 60rem, 100vw')}
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-
-      <aside class="buybox" aria-labelledby="buybox-title">
-        <h2 id="buybox-title" class="visually-hidden">Get {d.title}</h2>
-        <div class="buybox-price">
-          <span class="label">Price</span>
-          <span class="price">{priceLabel(d)}</span>
+    <div class="storefront-band">
+      <div class="container storefront">
+        <div class="storefront-media">
+          <Image
+            src={d.heroImage.src}
+            alt={d.heroImage.alt}
+            {...responsive(d.heroImage.src, [640, 1024, 1600, 2100], '(min-width: 64rem) 60rem, 100vw')}
+            loading="eager"
+            fetchpriority="high"
+          />
         </div>
-        <dl class="buybox-facts">
-          <div><dt class="label">Status</dt><dd><StatusBadge status={d.status} /></dd></div>
-          <div><dt class="label">Platforms</dt><dd>{d.platforms.join(', ')}</dd></div>
-        </dl>
-        <StoreButtons product={product} />
-        {d.hasPrivacyPolicy && <a class="buybox-privacy" href={privacyUrl(product)}>Privacy policy</a>}
-      </aside>
+
+        <aside class="buybox" aria-labelledby="buybox-title">
+          <h2 id="buybox-title" class="visually-hidden">Get {d.title}</h2>
+          <div class="buybox-price">
+            <span class="label">Price</span>
+            <span class="price">{priceLabel(d)}</span>
+          </div>
+          <dl class="buybox-facts">
+            <div><dt class="label">Status</dt><dd><StatusBadge status={d.status} /></dd></div>
+            <div><dt class="label">Platforms</dt><dd>{d.platforms.join(', ')}</dd></div>
+          </dl>
+          <StoreButtons product={product} />
+          {d.hasPrivacyPolicy && <a class="buybox-privacy" href={privacyUrl(product)}>Privacy policy</a>}
+        </aside>
+      </div>
     </div>
 
     <Section n={++n} label="Overview" title="What it is">
@@ -133,11 +135,15 @@ let n = 0;
     max-width: 40ch;
   }
 
+  /* Full-bleed rule, like every other section. */
+  .storefront-band {
+    border-bottom: var(--rule-thick);
+  }
+
   .storefront {
     display: grid;
     gap: var(--space-6);
     padding-bottom: clamp(2.5rem, 6vw, 5rem);
-    border-bottom: var(--rule-thick);
   }
 
   .storefront-media {

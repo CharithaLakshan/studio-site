@@ -23,14 +23,14 @@ const stage = STATUSES.indexOf(status) + 1;
     align-items: center;
     gap: var(--space-2);
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--step--1);
     font-weight: 700;
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    white-space: nowrap;
   }
 
   .status-steps {
+    flex: none;
     display: inline-flex;
     gap: 2px;
   }

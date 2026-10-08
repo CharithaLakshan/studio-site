@@ -23,7 +23,7 @@ const hasPlanned = buttons.some((b) => !b.href);
               </a>
             ) : (
               <span class="button button--soon">
-                {b.name}
+                <span>{b.name}</span>
                 <span class="visually-hidden">, </span>
                 <span class="soon">Coming soon</span>
               </span>
@@ -51,15 +51,27 @@ const hasPlanned = buttons.some((b) => !b.href);
     flex-direction: column;
   }
 
-  .stores--stack .button {
+  /* Row: buttons share the line while each fits on one line of its own, else they stack. */
+  .stores--row li {
+    flex: 1 1 15rem;
+  }
+
+  .stores .button {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .stores--stack .button {
     min-height: 3.25rem;
   }
 
-  /* Planned store: plain text in a dashed outline, muted (7:1), no hover, not focusable. */
+  /*
+   * Planned store: plain text in a dashed outline, muted (7.1:1 on paper, 7.9:1 on card), no hover,
+   * not focusable. When the name and "Coming soon" don't fit on one line, "Coming soon" moves below.
+   */
   .button--soon {
-    gap: var(--space-3);
+    flex-wrap: wrap;
+    gap: 0 var(--space-3);
     border-style: dashed;
     border-color: var(--color-ink-2);
     color: var(--color-ink-2);
@@ -69,6 +81,10 @@ const hasPlanned = buttons.some((b) => !b.href);
   .button--soon:hover {
     background: transparent;
     color: var(--color-ink-2);
+  }
+
+  .button--soon > span {
+    white-space: nowrap;
   }
 
   .soon {

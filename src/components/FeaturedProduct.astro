@@ -33,9 +33,10 @@ const d = product.data;
 <style>
   .featured {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     border: 2px solid var(--color-ink);
     background: var(--color-card);
-    box-shadow: 8px 8px 0 var(--color-ink);
+    box-shadow: var(--shadow-featured);
     margin: 0 8px 8px 0;
   }
 
