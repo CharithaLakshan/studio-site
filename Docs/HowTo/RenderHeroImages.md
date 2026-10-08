@@ -4,12 +4,13 @@ The home hero is a live path tracer. Before it starts, and when it can't run, th
 
 | File | Size | Used for |
 |---|---|---|
-| `wide-1024.jpg` | 1680×720, 1024 spp | Still frame at ≥40rem; third strip tile |
-| `tall-1024.jpg` | 864×1080, 1024 spp | Still frame below 40rem |
-| `strip-16.jpg` | 800×343, 16 spp | Second strip tile |
-| `strip-1.jpg` | 800×343, 1 spp | First strip tile |
+| `wide-1024.jpg` | 2400×733, 1024 spp | Still frame at ≥40rem. Rendered with the `STILL` framing (wider and taller than any plate needs) and scaled by CSS to match the live camera at any aspect from 1.2 to 4.2 |
+| `tall-1024.jpg` | 864×1080, 1024 spp | Still frame below 40rem (fixed phone framing) |
+| `strip-1024.jpg` | 800×450, 1024 spp | Third strip tile |
+| `strip-16.jpg` | 800×450, 16 spp | Second strip tile |
+| `strip-1.jpg` | 800×450, 1 spp | First strip tile |
 
-The same run also writes `public/og-default.jpg` (1200×630, no text).
+The same run also writes `public/og-default.jpg` (1200×630, the centre of the wide still, no text). `ONLY=strip,wide` or `ONLY=tall` renders a subset.
 
 Re-render them whenever you change the scene, the camera, the light or the tone mapping in `src/scripts/path-tracer.ts`:
 

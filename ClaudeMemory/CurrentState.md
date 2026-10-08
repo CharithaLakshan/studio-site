@@ -1,6 +1,6 @@
 # Current State
 
-_Rewritten at the end of every session. Last: 2026-10-08, final design (product showcase)._
+_Rewritten at the end of every session. Last: 2026-10-08, hero fits the first screen on desktop._
 
 ## What works
 
@@ -9,12 +9,14 @@ _Rewritten at the end of every session. Last: 2026-10-08, final design (product 
 - **Path-traced hero:** `src/components/PathTracer.astro` with `src/scripts/path-tracer.ts` and `path-tracer-hero.ts`.
   - Offline still frames (same renderer) for first paint, no WebGL2, no JS and reduced motion.
   - Starts after first paint and pauses off-screen or when the tab is hidden.
-  - DPR is capped at 2, with a 0.55 MP pixel budget; it goes idle at 1024 spp.
+  - DPR is capped at 2, with a 0.55 MP pixel budget (every desktop plate hits it, so speed is the same at 1920 px and up); it goes idle at 1024 spp.
+  - **Fits the first screen** on landscape screens ≥40rem: header, headline (capped at 11svh), tagline and the whole render; the spp row starts below the fold. Grid + subgrid in `index.astro` / `PathTracer.astro`. Portrait tablets and phones are unchanged in layout.
+  - **Framing:** `viewFor(aspect)` zooms and lens-shifts one fixed camera so every sphere and shadow fits any plate shape. The wide still uses the `STILL` view and CSS container units, so it matches the live render to the pixel (measured < 1 px). Phones keep the old fixed framing and still.
   - The 1/16/1024 strip is never empty.
 - **Content model:** `price`, `pricingModel`, `plannedStores`, `primaryStore`. `storeLinks` takes live URLs only. Store button verbs follow status and pricing. JSON-LD `Offer` appears only when the price is known.
 - **Brand:** single brand file `src/config/site.ts` (name, headline, tagline, owner, email, portfolioUrl, socials). The brand-swap test passed again.
 - **Assets:** self-hosted Space Grotesk and Space Mono (55 KB total). The design lab is deleted.
-- **Screenshots** of every page (1440 and 390 px): `Docs/Design/Screenshots/` (the `template-*` files show the draft sample product published temporarily, to show live store buttons, a price, a trailer and a privacy page).
+- **Screenshots** of every page (home re-shot after the hero fix) (1440 and 390 px): `Docs/Design/Screenshots/` (the `template-*` files show the draft sample product published temporarily, to show live store buttons, a price, a trailer and a privacy page).
 
 ## What's next
 

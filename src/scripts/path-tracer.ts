@@ -9,6 +9,14 @@
  * live hero and its fallback always match.
  */
 
+export const SPHERES: readonly (readonly [number, number, number, number])[] = [
+  [-1.15, 0.58, -0.55, 0.58], // matte cobalt
+  [0.22, 0.5, 0.25, 0.5], // glass
+  [1.38, 0.42, -0.85, 0.42], // chrome
+  [-0.18, 0.21, 1.05, 0.21], // matte black
+  [0.95, 0.16, 0.95, 0.16], // matte white
+];
+
 const VS = `#version 300 es
 void main() {
   vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
@@ -22,7 +30,9 @@ uniform vec2 uRes;
 uniform int uFrame;
 uniform vec3 uLight;
 uniform vec3 uCam;
-uniform float uFov;
+uniform vec3 uTarget;
+uniform float uHalf;
+uniform vec2 uShift;
 out vec4 o;
 
 const float PI = 3.14159265;
@@ -30,13 +40,8 @@ uint st;
 uint pcg() { st = st * 747796405u + 2891336453u; uint w = ((st >> ((st >> 28u) + 4u)) ^ st) * 277803737u; return (w >> 22u) ^ w; }
 float rnd() { return float(pcg()) / 4294967296.0; }
 
-const int NS = 5;
-const vec4 SPH[NS] = vec4[NS](
-  vec4(-1.15, 0.58, -0.55, 0.58),   // matte cobalt
-  vec4( 0.22, 0.50,  0.25, 0.50),   // glass
-  vec4( 1.38, 0.42, -0.85, 0.42),   // chrome
-  vec4(-0.18, 0.21,  1.05, 0.21),   // matte black
-  vec4( 0.95, 0.16,  0.95, 0.16));  // matte white
+const int NS = ${SPHERES.length};
+const vec4 SPH[NS] = vec4[NS](${SPHERES.map((s) => `vec4(${s.map((v) => v.toFixed(2)).join(', ')})`).join(', ')});
 const float LR = 1.1;
 const vec3 LE = vec3(9.0, 8.6, 8.0);
 
@@ -117,9 +122,10 @@ vec3 trace(vec3 ro, vec3 rd) {
 void main() {
   st = uint(gl_FragCoord.x) * 1973u + uint(gl_FragCoord.y) * 9277u + uint(uFrame) * 26699u | 1u; pcg();
   vec2 jit = vec2(rnd(), rnd());
-  vec2 uv = (gl_FragCoord.xy - 0.5 + jit - 0.5 * uRes) / uRes.y;
-  vec3 ta = vec3(0.0, 0.55, -0.35), ww = normalize(ta - uCam), uu = normalize(cross(ww, vec3(0, 1, 0))), vv = cross(uu, ww);
-  vec3 rd = normalize(uu * uv.x + vv * uv.y + ww * (1.0 / tan(uFov * 0.5) * 0.5));
+  // Image plane at distance 1: uHalf is the half-height, uShift the lens shift (both in tangent units).
+  vec2 uv = (gl_FragCoord.xy - 0.5 + jit - 0.5 * uRes) / uRes.y * 2.0 * uHalf + uShift;
+  vec3 ww = normalize(uTarget - uCam), uu = normalize(cross(ww, vec3(0, 1, 0))), vv = cross(uu, ww);
+  vec3 rd = normalize(uu * uv.x + vv * uv.y + ww);
   vec3 c = trace(uCam, rd);
   vec3 prev = texelFetch(uPrev, ivec2(gl_FragCoord.xy), 0).rgb;
   o = vec4(mix(prev, c, 1.0 / float(uFrame + 1)), 1.0);
@@ -139,12 +145,77 @@ void main() {
 
 export const DEFAULT_LIGHT: [number, number, number] = [-2.6, 4.4, 2.2];
 
-/** Camera framing per aspect ratio, so the spheres fit on phones and wide screens alike. */
-export function cameraFor(aspect: number): { pos: [number, number, number]; fov: number } {
-  if (aspect < 1.2) return { pos: [0, 1.5, 7.2], fov: 0.7 };
-  if (aspect < 2) return { pos: [0, 1.3, 6.0], fov: 0.62 };
-  return { pos: [0, 1.15, 4.9], fov: 0.62 };
+type Vec3 = [number, number, number];
+
+export interface View {
+  eye: Vec3;
+  target: Vec3;
+  /** Half-height of the image plane at distance 1 (tan of half the vertical field of view). */
+  half: number;
+  /** Lens shift in the same units: moves the frame without changing the perspective. */
+  shift: [number, number];
 }
+
+const EYE: Vec3 = [0, 1.25, 5.6];
+const TARGET: Vec3 = [0, 0.45, -0.2];
+/** Share of the frame the spheres may fill, so they stay clear of the soft top and bottom edges. */
+const SAFE = { x: 0.88, y: 0.66 };
+/** Each sphere is padded by this factor so its contact shadow stays in frame too. */
+const PAD = 1.3;
+
+const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = (a: Vec3): Vec3 => {
+  const l = Math.hypot(...a);
+  return [a[0] / l, a[1] / l, a[2] / l];
+};
+
+/**
+ * The box the padded spheres project to on the image plane of the fixed camera (tangent units):
+ * centre (cx, cy) and half-size (hx, hy). Each sphere's silhouette is bounded exactly per axis.
+ */
+function sceneBox() {
+  const ww = norm(sub(TARGET, EYE)), uu = norm(cross(ww, [0, 1, 0])), vv = cross(uu, ww);
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const [x, y, z, r] of SPHERES) {
+    const d = sub([x, y, z], EYE), r2 = r * PAD;
+    const cz = dot(d, ww);
+    for (const [c, axis] of [[dot(d, uu), 0], [dot(d, vv), 1]] as const) {
+      const a = Math.atan2(c, cz), s = Math.asin(r2 / Math.hypot(c, cz));
+      const lo = Math.tan(a - s), hi = Math.tan(a + s);
+      if (axis === 0) (x0 = Math.min(x0, lo)), (x1 = Math.max(x1, hi));
+      else (y0 = Math.min(y0, lo)), (y1 = Math.max(y1, hi));
+    }
+  }
+  return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, hx: (x1 - x0) / 2, hy: (y1 - y0) / 2 };
+}
+
+export const SCENE_BOX = sceneBox();
+
+/**
+ * Framing for a frame of the given aspect ratio (width / height). From 1:1 up, the fixed camera
+ * zooms (field of view) and shifts its lens so every sphere and its shadow fits in the safe area,
+ * whatever the shape of the frame. Any such view is an exact crop of any other, so a still rendered
+ * at STILL can be scaled with CSS to match the live render (see PathTracer.astro).
+ * Portrait frames (phones) keep their original, fixed framing.
+ */
+export function viewFor(aspect: number): View {
+  if (aspect < 1) return { eye: [0, 1.5, 7.2], target: [0, 0.55, -0.35], half: Math.tan(0.35), shift: [0, 0] };
+  const { cx, cy, hx, hy } = SCENE_BOX;
+  return { eye: EYE, target: TARGET, half: Math.max(hy / SAFE.y, hx / (SAFE.x * aspect)), shift: [cx, cy] };
+}
+
+/**
+ * The wide still: rendered at STILL.aspect with half-height STILL.half, so it still covers the frame
+ * for every aspect from 1.2 to 4.2. CSS sets its height to min(kh × frame height, kw × frame width).
+ */
+export const STILL = (() => {
+  const { hx, hy } = SCENE_BOX;
+  const half = Math.max(hy / SAFE.y, hx / (SAFE.x * 1.2));
+  const aspect = (4.2 * hy) / SAFE.y / half;
+  return { aspect, half, kh: (half * SAFE.y) / hy, kw: (half * SAFE.x) / hx };
+})();
 
 interface Target {
   tex: WebGLTexture;
@@ -165,7 +236,7 @@ export class PathTracer {
   private vao: WebGLVertexArrayObject;
   private targets: Target[] = [];
   private cur = 0;
-  private cam = cameraFor(16 / 9);
+  private view = viewFor(16 / 9);
   private u: Record<string, WebGLUniformLocation | null> = {};
 
   /** Returns null when WebGL2 or float render targets are missing, or a shader fails. */
@@ -209,7 +280,7 @@ export class PathTracer {
     };
     this.trace = link(TRACE);
     this.show = link(SHOW);
-    for (const n of ['uPrev', 'uRes', 'uFrame', 'uLight', 'uCam', 'uFov']) this.u[n] = gl.getUniformLocation(this.trace, n);
+    for (const n of ['uPrev', 'uRes', 'uFrame', 'uLight', 'uCam', 'uTarget', 'uHalf', 'uShift']) this.u[n] = gl.getUniformLocation(this.trace, n);
     this.u.uAcc = gl.getUniformLocation(this.show, 'uAcc');
     this.vao = gl.createVertexArray()!;
   }
@@ -222,7 +293,7 @@ export class PathTracer {
     const gl = this.gl;
     this.width = this.canvas.width = w;
     this.height = this.canvas.height = h;
-    this.cam = cameraFor(w / h);
+    this.view = viewFor(w / h);
     for (const t of this.targets) {
       gl.deleteTexture(t.tex);
       gl.deleteFramebuffer(t.fbo);
@@ -243,6 +314,12 @@ export class PathTracer {
     return true;
   }
 
+  /** Overrides the framing chosen by resize() (the offline still renderer uses STILL). */
+  setView(view: View) {
+    this.view = view;
+    this.reset();
+  }
+
   reset() {
     this.spp = 0;
   }
@@ -261,8 +338,10 @@ export class PathTracer {
     gl.uniform2f(this.u.uRes!, this.width, this.height);
     gl.uniform1i(this.u.uFrame!, this.spp);
     gl.uniform3fv(this.u.uLight!, this.light);
-    gl.uniform3fv(this.u.uCam!, this.cam.pos);
-    gl.uniform1f(this.u.uFov!, this.cam.fov);
+    gl.uniform3fv(this.u.uCam!, this.view.eye);
+    gl.uniform3fv(this.u.uTarget!, this.view.target);
+    gl.uniform1f(this.u.uHalf!, this.view.half);
+    gl.uniform2fv(this.u.uShift!, this.view.shift);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     this.cur = 1 - this.cur;
     this.spp++;
