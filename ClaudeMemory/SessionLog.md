@@ -119,3 +119,14 @@ Append one entry per session. Newest last.
   - **Copy:** the built HTML has no words glued to links. This fixed three missing spaces from JSX line breaks (Privacy, About, product privacy).
   - **Contrast:** every text pair computed: ink 15.0, ink-2 7.1, cobalt 7.1 on paper; 16.7, 7.9, 8.0 on card; paper on ink 15.0, `#aab3ff` on ink 9.5.
   - **Hero stills:** rendered in SwiftShader in 18 min (wide) and 13 min (tall). Stored as JPEG q93 (about 310 KB in total); the social image is JPEG (32 KB).
+
+## 2026-10-08 — Fix: hero cropped on desktop
+
+- **Problem:** at 1920×950 the headline took three huge lines and the 21:9 plate started about 500–600 px down, so the spheres were cut off by the bottom of the window (every desktop size from 1280×720 to 2560×1440 overflowed).
+- **Changes:**
+  - `index.astro`: on landscape screens ≥40rem (with `subgrid`), `.hero` is a grid `auto / minmax(15rem, 1fr) / auto`; a `::before` spacer spanning rows 1–2 is `100svh − header` tall, so the stage row gets exactly what the text leaves. Headline `clamp(2.75rem, min(1rem + 7.4vw, 11svh), 8.5rem)`; text padding uses svh too.
+  - `PathTracer.astro`: the figure takes rows 2–3 via subgrid (stage, then readout). The mask moves from the img to the `<picture>`; the wide still is sized with container units (`--still-kh/kw` from `STILL`) instead of `object-fit: cover`. Strip tiles use the new `strip-1024.jpg`.
+  - `path-tracer.ts`: spheres in one TS array (shader generated from it); `cameraFor` replaced by `viewFor` (fixed eye, FOV + lens shift fitted to each padded sphere's exact projection; portrait keeps the old phone camera); `STILL` framing; `setView()`. Shader takes `uTarget`, `uHalf`, `uShift`.
+  - `path-tracer-hero.ts`: live strip captures centred.
+  - Render script: strip at 800×450 incl. 1024 spp, wide at 2400×733 with `STILL`, og crop from the new wide. Tall still unchanged.
+- **Verification (headless Chromium):** 1280×720, 1366×768, 1440×900, 1536×864, 1920×950, 1920×1080, 2560×1440: stage bottom = viewport bottom, headline, tagline and all spheres visible: pass. 768×1024 and 390×844: nothing cut off (unchanged layout): pass. Live vs still cobalt-sphere centroid differs < 1 px at 1366, 1920, 2560 and 768. Canvas ≈ 0.55 MP at 1366, 1920 and 2560. `npm run check` 0/0/0, build without warnings.

@@ -11,7 +11,7 @@ DESKTOP                                             MOBILE
 [LKY]                 PRODUCTS  ABOUT  (PORTFOLIO↗) [LKY]  PRODUCTS ABOUT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   ━━━━━━━━━━━━━━━━━━━━━━
 HEADLINE (display h1, 8 col)     tagline (4 col)    HEADLINE (display h1)
-┌ crop marks ─────── path-traced plate 21:9 ────┐   tagline
+┌ crop marks ── plate: rest of the first screen ┐   tagline
 │               (still → live canvas)            │   ┌ plate 4:5 ┐
 └───────────────────────────────────────────────┘   └───────────┘
 0384 spp   caption (one paragraph)   [PAUSE][RESTART] 0384 spp

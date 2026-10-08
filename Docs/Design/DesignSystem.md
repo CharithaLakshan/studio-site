@@ -64,7 +64,7 @@ Paper text on the ink footer: 15.0:1.
 
 - Space scale `--space-1` … `--space-9`: 4, 8, 12, 16, 24, 32, 48, 64, 96 px.
 - `--gutter`: clamp(16px, 3.5vw, 48px). `--max-width`: 90rem.
-- Breakpoints (in media queries): 40rem (hero 16:9), 56rem (rail grid, hero text split, readout row), 64rem (hero 21:9, storefront two-column, featured card two-column).
+- Breakpoints (in media queries): 40rem (hero fills the first screen on landscape, else 16:9), 56rem (rail grid, hero text split, readout row), 64rem (hero 21:9, storefront two-column, featured card two-column).
 - `--rule`: 1px ink (table rows). `--rule-thick`: 3px ink (between page sections, under the header).
 - `--shadow-print`: `4px 4px 0` cobalt (primary buttons). Hover: `6px 6px 0` plus a −2px nudge.
 - `--shadow-card`: `6px 6px 0` ink (product cards; the featured card uses 8px). Hover: `8px 8px 0` cobalt plus a −2px nudge.
@@ -116,18 +116,19 @@ All components live in `src/components/`.
   - Scene: a white studio cove (floor, curved fillet, wall) with a matte cobalt, glass, chrome, black and white sphere under one spherical light.
   - Method: unidirectional path tracing with next-event estimation, up to 6 bounces and Russian roulette. A running average lives in a ping-pong RGBA32F (or RGBA16F) target, then ACES tone mapping.
   - Colour: the result is scaled so the cove equals `--color-paper`, and the plate's top and bottom fade into the page with a mask.
-- **Plate:** 4:5 below 40rem, 16:9 to 64rem, 21:9 above. Crop marks sit in the four corners.
+- **Plate:** 4:5 below 40rem. On landscape screens from 40rem (and wherever `subgrid` works) the first screen holds the header, the headline and the whole plate: the plate takes the height left under the headline (`100svh` minus header and text, at least 15rem), and the headline is capped at `11svh` so it stays near a third of the screen. The spp readout starts just below the fold. Elsewhere (portrait tablets, old browsers) the plate is 16:9 to 64rem and 21:9 above. Crop marks sit in the four corners.
+- **Framing:** from 1:1 up, one fixed camera zooms and shifts its lens so every sphere, padded for its contact shadow, fits a safe area (88% wide, 66% tall) of whatever shape the plate has (`viewFor()` in path-tracer.ts). Every such view is a crop of the same image, so the wide still is scaled with container units (`--still-kh`, `--still-kw`) to match the live render exactly. Portrait plates keep the fixed phone framing.
 - **Readout:** a giant mono spp counter, a one-paragraph caption, Pause and Restart buttons, and a three-tile strip (1, 16 and 1024 spp).
 - **Behaviour:**
   - **Before it runs,** and when it can't run (no WebGL2, no float targets, lost context), the plate shows a still frame rendered offline by the same code. The strip shows the matching 1, 16 and 1024 spp frames, so no tile is ever empty.
   - **Reduced motion:** the still frame stays. A "Render it live" button lets the visitor opt in.
   - **Start:** after first paint (`requestAnimationFrame`, then idle). The still hides, and the canvas renders one sample per pixel per frame.
-  - **Budget:** device pixel ratio capped at 2, pixel budget 0.55 MP.
+  - **Budget:** device pixel ratio capped at 2, pixel budget 0.55 MP. Every desktop plate hits the budget, so cost per frame and convergence speed are the same at 1920 px, 2560 px and beyond.
   - **Pausing:** pauses when the tab is hidden or the plate is off-screen.
   - **Stop:** at 1024 spp it stops completely; nothing runs until the light moves.
   - **Strip:** live frames are copied into the tiles at 1, 16 and 1024 spp. Moving the light resets them to the stills.
   - **Input:** click or drag (or arrow keys on the focused canvas) moves the light and restarts.
-- **Fallback images:** `src/assets/hero/{wide-1024,tall-1024,strip-1,strip-16}.jpg`, served as responsive WebP. Regenerate them with `node scripts/render-hero-images.mjs` (Docs/HowTo/RenderHeroImages.md). The same script writes `public/og-default.jpg`.
+- **Fallback images:** `src/assets/hero/{wide-1024,tall-1024,strip-1,strip-16,strip-1024}.jpg`, served as responsive WebP. Regenerate them with `node scripts/render-hero-images.mjs` (Docs/HowTo/RenderHeroImages.md). The same script writes `public/og-default.jpg`.
 
 ## Placeholder art
 

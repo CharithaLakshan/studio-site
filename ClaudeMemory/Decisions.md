@@ -145,3 +145,8 @@ Newest last. Format: date — decision. Options considered. Reason.
 
 - **Decision:** Space Grotesk (variable 300–700, 22 KB) and Space Mono 400/700 (17 KB each), self-hosted latin WOFF2 with OFL licences. Archivo, JetBrains Mono and the blue-noise dither are removed. A dark "paper grain" tile replaces the dither. Favicon and touch icon are two drawn brackets in ink with a cobalt offset (no text). Placeholder art is redrawn in ink and cobalt on paper, with centred labels so crops keep them. `public/design-lab/` is deleted, and so are the exploration screenshots; Concepts.md stays as the record.
 - **Header:** no JavaScript menu toggle any more (three items fit at 360px).
+
+## 2026-10-08 — Hero fits the first screen; camera fits the scene
+
+- **Decision:** on landscape screens the hero plate fills the height left under the header and headline (100svh based), with the headline capped at 11svh. The camera no longer has three fixed framings: it zooms and lens-shifts so all spheres fit any aspect, and the still is scaled to the same framing with container units. Phones keep their framing. The spp readout may start below the fold.
+- **Reason:** Charitha: on desktop the render sat below the fold and the spheres were cropped.

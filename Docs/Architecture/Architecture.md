@@ -24,7 +24,7 @@ src/
     product-privacy/<slug>.md  Optional per-product privacy policy
   assets/
     fonts/                     Space Grotesk (variable) + Space Mono 400/700 WOFF2 and OFL licences
-    hero/                      Path tracer stills: wide-1024 (21:9), tall-1024 (4:5), strip-1 and strip-16 (800px)
+    hero/                      Path tracer stills: wide-1024 (2400×733, STILL framing), tall-1024 (4:5), strip-1/16/1024 (800×450)
     products/<slug>/           Hero, screenshots (placeholders are placeholder-*.svg)
     paper-grain.png            Paper grain tile, inlined into CSS
   styles/tokens.css            @font-face + design tokens
