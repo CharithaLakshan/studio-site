@@ -71,3 +71,28 @@ Newest last. Format: date — decision. Options considered. Reason.
 
 - **Decision:** Rotunda ships with `hasPrivacyPolicy: false`. The pattern is shown and tested through the draft sample product.
 - **Reason:** A policy must state true facts about data collection, and those facts are unknown. Meta requires one before submission (tracked in CurrentState).
+
+## 2026-10-08 — Re-position: graphics and simulation first
+
+- **Decision:** Charitha set new studio priorities: (1) computer graphics and simulation (rendering, real-time graphics, simulation, procedural generation), (2) game development, (3) XR experiences. The site should feel made by a graphics programmer. This changes the brief's XR-leaning positioning; per CLAUDE.md, the instruction wins.
+- **Status:** Exploration only. The live site, `site.ts` tagline and Key Light tokens are unchanged until a concept is picked.
+
+## 2026-10-08 — Five home page concepts; Converge recommended
+
+- **Decision:** Five self-contained mockups in `public/design-lab/` (Key Light Relit, Viewport, Converge, Proceedings, Stir). Recommended: **Concept 3, Converge** (Swiss high-key layout around a progressive path tracer that sleeps when converged). Ranking and reasons: `Docs/Design/Exploration/Concepts.md`.
+- **Options considered:** also G-buffer pass breakdown and boids/cloth sims; the G-buffer idea is folded into Concepts 1 and 2 instead of a separate concept.
+- **Reason:** strongest graphics signal for the least UI, best idle cost (zero frames after convergence), M effort, product pages stay store-friendly.
+
+## 2026-10-08 — Design-lab mockups are exempt from the brand and font rules
+
+- **Decision:** The mockups hard-code the brand name, owner, socials and copy, and load Google Fonts, instead of using `site.ts` and self-hosted fonts.
+- **Reason:** Charitha asked for self-contained HTML files with Google Fonts allowed. They are temporary, `noindex`, outside the Astro build graph and outside the sitemap, and get deleted after the pick. The real implementation will follow the normal rules.
+
+## 2026-10-08 — Kirana and the IJACSA paper are mock content
+
+- **Decision:** Kirana (renderer, working name) and the 2026 IJACSA paper appear only in the design-lab mockups. Whether they go on the real site is decided after the pick. Only the facts Charitha gave are used; illustrative diagrams are labelled as such.
+
+## 2026-10-08 — Exploration screenshots stored as JPEG
+
+- **Decision:** Desktop (1440 px) and mobile (390 px) full-page screenshots in `Docs/Design/Exploration/screenshots/` are JPEG q85 (3.8 MB total), not PNG (8.7 MB). The gallery uses 640×400 JPEG thumbnails in `public/design-lab/thumbs/` (about 220 KB).
+- **Reason:** The halftone and noise-heavy renders compress poorly as PNG. These files are temporary too.

@@ -36,3 +36,28 @@ Append one entry per session. Newest last.
   - **Brand-swap test:** set `name` to "Halcyon Works" and built. `LKY` matched 0 times in `dist/`, `src/`, `public/`, `.github/`. "Halcyon Works" appeared on all 6 HTML pages. No owner name, email, social or site URLs outside `site.ts` (except `TODO(charitha)` comments). Reverted.
 - **Files:** `package.json`, `package-lock.json`, `astro.config.ts`, `tsconfig.json`, `.gitignore`, `.nvmrc`, `.github/workflows/deploy.yml`, `public/*`, `src/**`, `CLAUDE.md`, `README.md`, `ClaudeMemory/*`, `Docs/Design/{DesignSystem,PageSpecs}.md`, `Docs/Architecture/*`, `Docs/HowTo/*`, `Docs/Roadmap.md`.
 - **Open issues:** Lighthouse not run (no Lighthouse in this environment), deferred to Stage 3. HTML mockups skipped by decision. See CurrentState for the TODOs.
+
+## 2026-10-08 — Session 2 — Design exploration: graphics-first concepts
+
+- **Model / effort:** claude-opus-5-5, default effort.
+- **Stage:** Exploration (between Stage 2 and 3). No existing page, component or style was changed.
+- **Done:**
+  - Five self-contained home page concepts in `public/design-lab/`, each with header and wordmark, hero with a real-time element, featured Rotunda, products grid, Lab (Kirana and the IJACSA paper), footer with YouTube and GitHub:
+    1. **Key Light, Relit**: WebGL2 coffered-dome relief baked to a G-buffer once, relit every frame by a pointer-driven key light with soft shadows.
+    2. **Viewport**: engine-editor shell; WebGL2 rasterizer (5.6k-tri procedural rotunda and tree), shadow map, 7 view modes (Lit, Albedo, Normals, Depth, Wireframe, Overdraw, Shadow map), object selection, console log.
+    3. **Converge**: Swiss high-key; WebGL2 progressive path tracer (NEE, glass, chrome, cove), spp counter, 1/16/1024 spp strip, idles at 1024 spp.
+    4. **Proceedings**: page typeset as a paper; Canvas 2D space-colonization tree as live Figure 1; MathML equations; references.
+    5. **Stir**: riso zine; WebGL2 stable fluids printed as a two-ink rotated halftone with misregistration.
+  - Gallery `public/design-lab/index.html` with thumbnails. All design-lab pages `noindex`.
+  - `Docs/Design/Exploration/Concepts.md`: palette, type, real-time element and cost, Rotunda and Lab in each style, accessibility, risks, effort, ranking, recommendation (Converge), mixes.
+  - Screenshots: `Docs/Design/Exploration/screenshots/concept-N-{desktop,mobile}.jpg`.
+- **Verification (headless Chromium, SwiftShader WebGL2):**
+  - No console errors and no horizontal overflow at 1440 px and 390 px on all five pages and the gallery.
+  - rAF calls per second: running at the top of the page, **0** when scrolled away (all five).
+  - Reduced motion: **0** rAF afterwards and a non-blank still frame (all five).
+  - `--disable-3d-apis`: `html.no-gl` and the static fallback frame (1, 2, 3, 5; 4 needs no WebGL).
+  - Concept 2: every view mode and selection screenshot-checked. Concept 4: regrow and slider work; growth stops when it stalls.
+  - WCAG contrast of every text pair computed (all ≥ 4.5:1; riso blue `#0078bf` is decorative only).
+  - `npm run check`: 0 errors, 0 warnings, 0 hints. `npm run build`: 6 pages; design-lab copied to `dist/`, absent from the sitemap.
+- **Files:** `public/design-lab/**`, `Docs/Design/Exploration/**`, `ClaudeMemory/{SessionLog,Decisions,CurrentState}.md`.
+- **Open issues:** Real-GPU frame times not measured (software GPU only); use the backtick overlay on a device. Waiting for Charitha's pick.
