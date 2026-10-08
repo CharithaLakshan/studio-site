@@ -8,48 +8,58 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  <div class="container site-footer-inner">
-    <div class="site-footer-brand">
-      <Wordmark />
-      <p class="site-footer-tagline">{site.tagline}</p>
-    </div>
-    <nav aria-label="Footer">
-      <SocialLinks />
+  <div class="container">
+    <nav aria-label="Elsewhere">
+      <SocialLinks variant="big" />
     </nav>
-    <p class="site-footer-meta">
-      © {year} {site.owner.name}. <a href={url('privacy/')}>Privacy</a>
-    </p>
+    <div class="site-footer-meta">
+      <p>
+        <a class="site-footer-home" href={url()} aria-label={`${site.name} home`}><Wordmark inverse /></a>
+        <span class="site-footer-tagline">{site.tagline}</span>
+      </p>
+      <p>
+        <a href={url('privacy/')}>Privacy</a> · © {year} {site.owner.name}
+      </p>
+    </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    margin-top: var(--space-9);
-    border-top: 1px solid var(--color-line);
-    background: var(--color-surface);
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding-block: clamp(2.5rem, 6vw, 5rem) var(--space-5);
   }
 
-  .site-footer-inner {
-    display: grid;
-    gap: var(--space-5);
-    padding-block: var(--space-7);
+  .site-footer :global(a) {
+    color: var(--color-paper);
   }
 
-  .site-footer-tagline,
+  .site-footer :global(a:hover) {
+    color: var(--color-blue-on-ink);
+  }
+
+  .site-footer :focus-visible {
+    outline-color: var(--color-blue-on-ink);
+  }
+
   .site-footer-meta {
-    margin-top: var(--space-2);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgb(231 229 224 / 0.35);
+    font-family: var(--font-mono);
     font-size: var(--step--1);
-    color: var(--color-text-muted);
   }
 
-  @media (min-width: 40rem) {
-    .site-footer-inner {
-      grid-template-columns: 1fr auto;
-      align-items: start;
-    }
-
-    .site-footer-meta {
-      grid-column: 1 / -1;
-    }
+  .site-footer-home {
+    font-family: var(--font-sans);
+    font-size: 1.25rem;
+    text-decoration: none;
+    margin-right: var(--space-3);
   }
 </style>

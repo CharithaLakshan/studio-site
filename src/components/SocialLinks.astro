@@ -1,19 +1,28 @@
 ---
 import { site } from '../config/site';
 
+interface Props {
+  /** "inline": small mono labels. "big": the footer's large display links. */
+  variant?: 'inline' | 'big';
+}
+const { variant = 'inline' } = Astro.props;
+
+/** Portfolio first: everything about the person lives there. Empty values are hidden. */
 const links = [
-  { label: 'YouTube', href: site.socials.youtube },
-  { label: 'GitHub', href: site.socials.github },
+  { label: 'Portfolio', href: site.portfolioUrl as string },
+  { label: 'YouTube', href: site.socials.youtube as string },
+  { label: 'GitHub', href: site.socials.github as string },
   { label: 'Email', href: site.email ? `mailto:${site.email}` : '' },
 ].filter((l) => l.href);
 ---
 
-<ul class="social-links">
+<ul class:list={['social-links', `social-links--${variant}`]}>
   {
     links.map((l) => (
       <li>
         <a href={l.href} rel={l.href.startsWith('http') ? 'me noopener' : undefined}>
           {l.label}
+          {l.href.startsWith('http') && <span aria-hidden="true">↗</span>}
         </a>
       </li>
     ))
@@ -24,17 +33,35 @@ const links = [
   .social-links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2) var(--space-5);
     padding: 0;
     list-style: none;
+  }
+
+  .social-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-height: 2.75rem;
+  }
+
+  .social-links--inline {
+    gap: 0 var(--space-5);
     font-family: var(--font-mono);
     font-size: var(--step--1);
+    font-weight: 700;
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
   }
 
-  .social-links a {
-    display: inline-block;
-    padding-block: var(--space-2);
+  .social-links--big {
+    flex-direction: column;
+  }
+
+  .social-links--big a {
+    font-size: clamp(2rem, 1.2rem + 3.4vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: var(--tracking-tight);
+    text-decoration-thickness: 3px;
   }
 </style>

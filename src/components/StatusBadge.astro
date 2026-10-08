@@ -1,45 +1,52 @@
 ---
 import { STATUS_LABELS, type Status } from '../lib/products';
+import { STATUSES } from '../content.config';
 
 interface Props {
   status: Status;
 }
 const { status } = Astro.props;
+// Four squares, filled up to the current stage: concept 1, in development 2, early access 3, released 4.
+const stage = STATUSES.indexOf(status) + 1;
 ---
 
-<span class="status-badge" data-status={status}>{STATUS_LABELS[status]}</span>
+<span class="status" data-status={status}>
+  <span class="status-steps" aria-hidden="true">
+    {[1, 2, 3, 4].map((i) => <i class:list={{ on: i <= stage }} />)}
+  </span>
+  {STATUS_LABELS[status]}
+</span>
 
 <style>
-  .status-badge {
+  .status {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: 0.2rem 0.6rem;
-    border: 1px solid var(--color-line-strong);
-    border-radius: var(--radius-pill);
-    background: rgb(11 12 14 / 0.7);
     font-family: var(--font-mono);
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 700;
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--color-text);
     white-space: nowrap;
   }
 
-  /* A small "light" whose intensity shows how far along the product is. */
-  .status-badge::before {
-    content: '';
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: var(--color-key);
-    opacity: var(--lamp, 1);
-    box-shadow: 0 0 0.5rem rgb(242 182 109 / calc(var(--lamp, 1) * 0.8));
+  .status-steps {
+    display: inline-flex;
+    gap: 2px;
   }
 
-  [data-status='concept'] { --lamp: 0.3; }
-  [data-status='in-development'] { --lamp: 0.55; }
-  [data-status='early-access'] { --lamp: 0.8; }
-  [data-status='released'] { --lamp: 1; }
+  .status-steps i {
+    width: 0.5rem;
+    height: 0.5rem;
+    border: 1.5px solid var(--color-ink);
+  }
+
+  .status-steps i.on {
+    background: var(--color-ink);
+  }
+
+  [data-status='released'] .status-steps i.on {
+    background: var(--color-blue);
+    border-color: var(--color-blue);
+  }
 </style>

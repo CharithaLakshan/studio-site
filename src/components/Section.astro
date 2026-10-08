@@ -1,0 +1,28 @@
+---
+import { pad2 } from '../lib/products';
+
+interface Props {
+  /** Section number on the rail: 1 -> "01". */
+  n: number;
+  /** Small mono caption under the number. */
+  label: string;
+  /** The h2. */
+  title: string;
+  id?: string;
+}
+const { n, label, title, id } = Astro.props;
+const titleId = `${id ?? `section-${n}`}-title`;
+---
+
+<section class="section" id={id} aria-labelledby={titleId}>
+  <div class="container rail-grid">
+    <div class="rail">
+      <span class="rail-number" aria-hidden="true">{pad2(n)}</span>
+      <span class="label">{label}</span>
+    </div>
+    <div class="rail-body">
+      <h2 id={titleId}>{title}</h2>
+      <slot />
+    </div>
+  </div>
+</section>

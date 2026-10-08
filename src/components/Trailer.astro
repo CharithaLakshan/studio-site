@@ -13,8 +13,8 @@ const { youTubeId, title, poster } = Astro.props;
 
 <div class="trailer" data-trailer={youTubeId} data-title={`${title} trailer`}>
   <a class="trailer-poster" href={`https://www.youtube.com/watch?v=${youTubeId}`}>
-    <Image src={poster} alt="" {...responsive(poster, [640, 1024, 1600], '(min-width: 64rem) 46rem, 100vw')} />
-    <span class="trailer-play">
+    <Image src={poster} alt="" {...responsive(poster, [640, 1024, 1600], '(min-width: 64rem) 60rem, 100vw')} />
+    <span class="trailer-play button button--primary">
       <span class="trailer-icon" aria-hidden="true"></span>
       Play the {title} trailer
     </span>
@@ -46,14 +46,12 @@ const { youTubeId, title, poster } = Astro.props;
 
   .trailer-poster,
   .trailer :global(iframe) {
-    position: relative;
     display: grid;
     width: 100%;
     aspect-ratio: 16 / 9;
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-l);
+    border: 2px solid var(--color-ink);
+    background: var(--color-paper-2);
     overflow: hidden;
-    background: var(--color-raised);
   }
 
   .trailer-poster > :global(*) {
@@ -64,26 +62,15 @@ const { youTubeId, title, poster } = Astro.props;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.6;
-    transition: opacity var(--dur-base) var(--ease-out);
-  }
-
-  .trailer-poster:hover :global(img) {
-    opacity: 0.8;
   }
 
   .trailer-play {
     place-self: center;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-5);
-    border-radius: var(--radius-pill);
-    background: var(--color-key);
-    color: var(--color-on-key);
-    font-weight: 650;
-    text-decoration: none;
-    box-shadow: 0 0 3rem -0.5rem rgb(242 182 109 / 0.6);
+  }
+
+  .trailer-poster:hover .trailer-play {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-print-hover);
   }
 
   .trailer-icon {
@@ -95,6 +82,6 @@ const { youTubeId, title, poster } = Astro.props;
 
   .trailer-note {
     font-size: var(--step--1);
-    color: var(--color-text-muted);
+    color: var(--color-ink-2);
   }
 </style>

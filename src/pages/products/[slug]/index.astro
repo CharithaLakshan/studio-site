@@ -1,15 +1,18 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import { Image } from 'astro:assets';
-import { responsive } from '../../../lib/images';
 import { render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import FeatureList from '../../../components/FeatureList.astro';
 import Gallery from '../../../components/Gallery.astro';
-import SpecSheet from '../../../components/SpecSheet.astro';
+import Section from '../../../components/Section.astro';
+import SpecTable from '../../../components/SpecTable.astro';
+import StatusBadge from '../../../components/StatusBadge.astro';
+import StoreButtons from '../../../components/StoreButtons.astro';
 import SystemRequirements from '../../../components/SystemRequirements.astro';
 import Trailer from '../../../components/Trailer.astro';
-import { getProducts, type Product } from '../../../lib/products';
+import { responsive } from '../../../lib/images';
+import { TYPE_LABELS, getProducts, priceLabel, privacyUrl, type Product } from '../../../lib/products';
 import { productJsonLd, socialImageFor } from '../../../lib/seo';
 import { absolute, url } from '../../../lib/url';
 
@@ -23,174 +26,189 @@ const d = product.data;
 const { Content } = await render(product);
 const image = await socialImageFor(d.heroImage.src, d.heroImage.alt);
 const jsonLd = productJsonLd(product, absolute(Astro.url.pathname), image);
+
+// Optional sections are numbered only when present, so the rail always reads 01, 02, 03...
+let n = 0;
 ---
 
 <BaseLayout title={`${d.title}: ${d.tagline}`} description={d.summary} image={image} jsonLd={jsonLd}>
   <article class="product">
-    <header class="product-hero">
-      <div class="product-hero-media">
+    <header class="container product-head">
+      <a class="label back-link" href={url('products/')}>← All products</a>
+      <p class="label">{TYPE_LABELS[d.type].one} · {d.platforms.join(', ')}</p>
+      <h1 class="display">{d.title}</h1>
+      <p class="lede">{d.tagline}</p>
+    </header>
+
+    <div class="container storefront">
+      <div class="storefront-media">
         <Image
           src={d.heroImage.src}
           alt={d.heroImage.alt}
-          {...responsive(d.heroImage.src, [640, 1024, 1600, 2100], '100vw')}
+          {...responsive(d.heroImage.src, [640, 1024, 1600, 2100], '(min-width: 64rem) 60rem, 100vw')}
           loading="eager"
           fetchpriority="high"
         />
       </div>
-      <div class="container product-hero-text">
-        <a class="label back-link" href={url('products/')}>← All products</a>
-        <h1 class="display">{d.title}</h1>
-        <p class="lede">{d.tagline}</p>
-      </div>
-    </header>
 
-    <div class="container product-layout">
-      <div class="product-aside">
-        <SpecSheet product={product} />
-      </div>
-
-      <div class="product-main">
-        <section aria-labelledby="about-title">
-          <h2 id="about-title" class="visually-hidden">About {d.title}</h2>
-          <div class="prose"><Content /></div>
-        </section>
-
-        {
-          d.features.length > 0 && (
-            <section aria-labelledby="features-title">
-              <h2 id="features-title">Key features</h2>
-              <FeatureList features={d.features} />
-            </section>
-          )
-        }
-
-        {
-          d.trailerYouTubeId && (
-            <section aria-labelledby="trailer-title">
-              <h2 id="trailer-title">Trailer</h2>
-              <Trailer youTubeId={d.trailerYouTubeId} title={d.title} poster={d.heroImage.src} />
-            </section>
-          )
-        }
-
-        {
-          d.screenshots.length > 0 && (
-            <section aria-labelledby="screens-title">
-              <h2 id="screens-title">Screenshots</h2>
-              <Gallery images={d.screenshots} />
-            </section>
-          )
-        }
-
-        {
-          d.systemRequirements && (
-            <section aria-labelledby="sysreq-title">
-              <h2 id="sysreq-title">System requirements</h2>
-              <SystemRequirements requirements={d.systemRequirements} />
-            </section>
-          )
-        }
-      </div>
+      <aside class="buybox" aria-labelledby="buybox-title">
+        <h2 id="buybox-title" class="visually-hidden">Get {d.title}</h2>
+        <div class="buybox-price">
+          <span class="label">Price</span>
+          <span class="price">{priceLabel(d)}</span>
+        </div>
+        <dl class="buybox-facts">
+          <div><dt class="label">Status</dt><dd><StatusBadge status={d.status} /></dd></div>
+          <div><dt class="label">Platforms</dt><dd>{d.platforms.join(', ')}</dd></div>
+        </dl>
+        <StoreButtons product={product} />
+        {d.hasPrivacyPolicy && <a class="buybox-privacy" href={privacyUrl(product)}>Privacy policy</a>}
+      </aside>
     </div>
+
+    <Section n={++n} label="Overview" title="What it is">
+      <div class="prose description"><Content /></div>
+    </Section>
+
+    {
+      d.trailerYouTubeId && (
+        <Section n={++n} label="Video" title="Trailer">
+          <Trailer youTubeId={d.trailerYouTubeId} title={d.title} poster={d.heroImage.src} />
+        </Section>
+      )
+    }
+
+    {
+      d.screenshots.length > 0 && (
+        <Section n={++n} label={`${d.screenshots.length} image${d.screenshots.length === 1 ? '' : 's'}`} title="Screenshots">
+          <Gallery images={d.screenshots} />
+        </Section>
+      )
+    }
+
+    {
+      d.features.length > 0 && (
+        <Section n={++n} label="Features" title="What it does">
+          <FeatureList features={d.features} />
+        </Section>
+      )
+    }
+
+    <Section n={++n} label="Details" title="Specs">
+      <SpecTable product={product} caption={`${d.title} specs`} />
+    </Section>
+
+    {
+      d.systemRequirements && (
+        <Section n={++n} label="Hardware" title="System requirements">
+          <SystemRequirements requirements={d.systemRequirements} />
+        </Section>
+      )
+    }
   </article>
 </BaseLayout>
 
 <style>
-  .product-hero {
+  .product-head {
     display: grid;
-    position: relative;
-    isolation: isolate;
+    gap: var(--space-3);
+    justify-items: start;
+    padding-block: var(--space-5) var(--space-6);
   }
 
-  .product-hero > * {
-    grid-area: 1 / 1;
+  .back-link {
+    color: var(--color-ink);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-bottom: var(--space-2);
   }
 
-  .product-hero-media {
-    position: relative;
-    z-index: -1;
-    aspect-ratio: 4 / 3;
-    max-height: 80vh;
+  .back-link:hover {
+    color: var(--color-blue);
+  }
+
+  .product-head .lede {
+    max-width: 40ch;
+  }
+
+  .storefront {
+    display: grid;
+    gap: var(--space-6);
+    padding-bottom: clamp(2.5rem, 6vw, 5rem);
+    border-bottom: var(--rule-thick);
+  }
+
+  .storefront-media {
+    aspect-ratio: 16 / 9;
     overflow: hidden;
+    border: 2px solid var(--color-ink);
+    background: var(--color-paper-2);
   }
 
-  .product-hero-media :global(img) {
+  .storefront-media :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  /* Vignette: darkens the lower-left where the title sits. */
-  .product-hero-media::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(to top, var(--color-void) 0%, rgb(11 12 14 / 0.75) 30%, transparent 70%),
-      radial-gradient(120% 90% at 50% 30%, transparent 50%, rgb(11 12 14 / 0.6) 100%);
+  .buybox {
+    display: grid;
+    gap: var(--space-5);
+    align-content: start;
   }
 
-  .product-hero-text {
-    align-self: end;
+  .buybox-price {
     display: grid;
+    gap: var(--space-1);
+    padding-bottom: var(--space-4);
+    border-bottom: var(--rule);
+  }
+
+  .price {
+    font-size: var(--step-2);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .buybox-facts {
+    display: grid;
+  }
+
+  .buybox-facts > div {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
     gap: var(--space-3);
-    justify-items: start;
-    padding-bottom: var(--space-6);
-  }
-
-  .back-link {
-    text-decoration: none;
-    color: var(--color-text-muted);
+    align-items: baseline;
     padding-block: var(--space-2);
+    border-bottom: var(--rule);
   }
 
-  .back-link:hover {
-    color: var(--color-text);
+  .buybox-facts dd {
+    font-size: var(--step-0);
   }
 
-  .product-hero-text .lede {
-    max-width: 36rem;
-    color: var(--color-text);
+  .buybox-privacy {
+    justify-self: start;
+    font-size: var(--step--1);
   }
 
-  .product-layout {
-    display: grid;
-    gap: var(--space-7);
-    padding-top: var(--space-6);
-  }
-
-  .product-main {
-    display: grid;
-    gap: var(--space-8);
-    min-width: 0;
-  }
-
-  .product-main h2:not(.visually-hidden) {
-    margin-bottom: var(--space-5);
-  }
-
-  @media (min-width: 48rem) {
-    .product-hero-media {
-      aspect-ratio: 21 / 9;
-    }
+  .description {
+    font-size: var(--step-1);
+    line-height: 1.45;
   }
 
   @media (min-width: 64rem) {
-    .product-layout {
-      grid-template-columns: minmax(0, 1fr) 22rem;
+    .storefront {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
       align-items: start;
     }
 
-    .product-aside {
-      grid-column: 2;
-      grid-row: 1;
+    .buybox {
       position: sticky;
       top: var(--space-5);
-    }
-
-    .product-main {
-      grid-column: 1;
-      grid-row: 1;
     }
   }
 </style>

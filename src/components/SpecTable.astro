@@ -1,0 +1,39 @@
+---
+import StatusBadge from './StatusBadge.astro';
+import { TYPE_LABELS, formatDate, priceLabel, privacyUrl, type Product } from '../lib/products';
+
+interface Props {
+  product: Product;
+  /** "short" for cards: type, platforms, price, status. "full" adds release and privacy policy. */
+  rows?: 'short' | 'full';
+  caption?: string;
+}
+const { product, rows = 'full', caption } = Astro.props;
+const d = product.data;
+---
+
+<table class="spec-table">
+  {caption && <caption class="visually-hidden">{caption}</caption>}
+  <tbody>
+    <tr><th scope="row">Type</th><td>{TYPE_LABELS[d.type].one}</td></tr>
+    <tr><th scope="row">Platforms</th><td>{d.platforms.join(', ')}</td></tr>
+    <tr><th scope="row">Price</th><td>{priceLabel(d)}</td></tr>
+    <tr><th scope="row">Status</th><td><StatusBadge status={d.status} /></td></tr>
+    {
+      rows === 'full' && d.releaseDate && (
+        <tr>
+          <th scope="row">Release</th>
+          <td><time datetime={d.releaseDate.toISOString().slice(0, 10)}>{formatDate(d.releaseDate)}</time></td>
+        </tr>
+      )
+    }
+    {
+      rows === 'full' && d.hasPrivacyPolicy && (
+        <tr>
+          <th scope="row">Privacy</th>
+          <td><a href={privacyUrl(product)}>{d.title} privacy policy</a></td>
+        </tr>
+      )
+    }
+  </tbody>
+</table>
