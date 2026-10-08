@@ -150,3 +150,20 @@ Newest last. Format: date — decision. Options considered. Reason.
 
 - **Decision:** on landscape screens the hero plate fills the height left under the header and headline (100svh based), with the headline capped at 11svh. The camera no longer has three fixed framings: it zooms and lens-shifts so all spheres fit any aspect, and the still is scaled to the same framing with container units. Phones keep their framing. The spp readout may start below the fold.
 - **Reason:** Charitha: on desktop the render sat below the fold and the spheres were cropped.
+
+## 2026-10-08 — Stage 3 review decisions
+
+- **Software WebGL keeps the still frame.**
+  - Decision: when the WebGL2 renderer is SwiftShader, llvmpipe or another software renderer, the hero shows the 1024 spp still and a "Render it live" button, as under reduced motion.
+  - Options: always run (TBT 84 s, a frozen tab without a GPU, Lighthouse/PSI 59); lower the resolution on software (still seconds per frame).
+  - Reason: the visitor without a GPU and PageSpeed Insights both get a fast page, and the opt-in keeps the live render reachable.
+- **Inline all CSS.**
+  - Decision: `build.inlineStylesheets: 'always'`.
+  - Reason: about 19 KB raw, 5 KB gzipped. One fewer render-blocking request beats cross-page caching for a 5-page site.
+- **Product social image.**
+  - Decision: a 1200×630 cover crop of the raster hero, and the build fails when the hero is smaller.
+  - Reason: Astro doesn't upscale, and an undersized image would make the declared `og:image` size false. `image()` metadata isn't available inside the Zod schema in Astro 7, so the check lives in `socialImageFor()`.
+- **Keep `role="list"`** on styled lists despite html-validate's "redundant role". Reason: Safari/VoiceOver drops list semantics when `list-style: none`.
+- **Store buttons are full width in both layouts.**
+  - Decision: the `row` layout wraps at 15rem per button.
+  - Reason: the featured card's text column is narrow at every width, and the old inline buttons broke into fragments.
