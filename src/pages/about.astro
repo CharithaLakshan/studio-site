@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { site } from '../config/site';
+import { url } from '../lib/url';
+
+const { owner } = site;
+// TODO(charitha): keep the study line below current after graduation.
+---
+
+<BaseLayout title="About" description={`About ${site.name} and ${owner.name}, the person behind it.`}>
+  <PageHeader title="About" label={site.name} lede={site.intro} />
+
+  <div class="container about">
+    <section class="prose" aria-labelledby="studio-title">
+      <h2 id="studio-title">The studio</h2>
+      <p>
+        {site.name} makes games, VR apps, tools and real-time experiences. Every product has its own
+        page on this site, with links to the stores where you can get it.
+      </p>
+      <p><a href={url('products/')}>See all products</a></p>
+    </section>
+
+    <section class="prose" aria-labelledby="person-title">
+      <h2 id="person-title">The person behind it</h2>
+      <p>
+        <strong>{owner.name}</strong>, known online as {owner.alias}. {owner.role}, working in
+        real-time graphics and XR, based in {owner.location}.
+      </p>
+      <p>Final-year Computer Science undergraduate at the University of Colombo School of Computing.</p>
+      <p>
+        Works with Unity, Unreal Engine 5 and Blender, writing C, C++, C#, Python and CUDA. Interested in
+        real-time rendering, procedural generation, VR/XR and game development.
+      </p>
+    </section>
+
+    <section aria-labelledby="links-title">
+      <h2 id="links-title">Find me</h2>
+      <SocialLinks />
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--space-8);
+    padding-top: var(--space-5);
+  }
+
+  .about h2 {
+    margin-bottom: var(--space-4);
+  }
+</style>

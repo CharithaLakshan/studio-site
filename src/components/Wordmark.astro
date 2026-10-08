@@ -1,0 +1,26 @@
+---
+import { site } from '../config/site';
+
+// Punctuation in the name (e.g. brackets) is dimmed; letters stay bright. Works for any name.
+const parts = [...site.name].map((ch) => ({ ch, mark: !/[\p{L}\p{N}\s]/u.test(ch) }));
+---
+
+<span class="wordmark">
+  {parts.map(({ ch, mark }) => (mark ? <span class="wordmark-mark">{ch}</span> : ch))}
+</span>
+
+<style>
+  .wordmark {
+    font-family: var(--font-sans);
+    font-stretch: 125%;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  .wordmark-mark {
+    color: var(--color-key);
+    font-weight: 400;
+  }
+</style>

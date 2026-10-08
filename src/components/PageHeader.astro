@@ -1,0 +1,33 @@
+---
+interface Props {
+  title: string;
+  label?: string;
+  lede?: string;
+}
+const { title, label, lede } = Astro.props;
+---
+
+<header class="page-header light-field">
+  <div class="container">
+    {label && <p class="label">{label}</p>}
+    <h1>{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+    <slot />
+  </div>
+</header>
+
+<style>
+  .page-header {
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  .page-header .container {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  .lede {
+    max-width: 40rem;
+  }
+</style>

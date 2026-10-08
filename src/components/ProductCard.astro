@@ -1,0 +1,120 @@
+---
+import { Image } from 'astro:assets';
+import { responsive } from '../lib/images';
+import StatusBadge from './StatusBadge.astro';
+import { TYPE_LABELS, productUrl, type Product } from '../lib/products';
+
+interface Props {
+  product: Product;
+  headingLevel?: 'h2' | 'h3';
+}
+const { product, headingLevel: H = 'h3' } = Astro.props;
+const d = product.data;
+---
+
+<article class="product-card">
+  <div class="product-card-media">
+    <Image
+      src={d.heroImage.src}
+      alt=""
+      {...responsive(d.heroImage.src, [400, 640, 960], '(min-width: 64rem) 24rem, (min-width: 40rem) 50vw, 100vw')}
+    />
+  </div>
+  <div class="product-card-body">
+    <p class="label">{TYPE_LABELS[d.type].one} · {d.platforms.join(', ')}</p>
+    <H class="product-card-title">
+      <a href={productUrl(product)}>{d.title}</a>
+    </H>
+    <p class="product-card-tagline">{d.tagline}</p>
+    <StatusBadge status={d.status} />
+  </div>
+</article>
+
+<style>
+  .product-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid transparent;
+    border-radius: var(--radius-l);
+    background:
+      linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+      var(--rim) border-box;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Raised light on hover/focus: fades in a brighter rim and a warm pool. */
+  .product-card::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border: 1px solid transparent;
+    border-radius: inherit;
+    background:
+      radial-gradient(120% 80% at 85% 0%, var(--light-key), transparent 60%) padding-box,
+      var(--rim-strong) border-box;
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--ease-out);
+    pointer-events: none;
+  }
+
+  .product-card:hover::after,
+  .product-card:focus-within::after {
+    opacity: 1;
+  }
+
+  .product-card-media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-raised);
+  }
+
+  .product-card-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-card-body {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+    padding: var(--space-5);
+  }
+
+  .product-card-title {
+    font-size: var(--step-2);
+    font-stretch: var(--stretch-display);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .product-card-title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  /* Whole card is clickable via the title link. */
+  .product-card-title a::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .product-card-title a:focus-visible {
+    outline: none;
+  }
+
+  .product-card:has(a:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-offset);
+  }
+
+  .product-card-tagline {
+    color: var(--color-text-muted);
+  }
+</style>

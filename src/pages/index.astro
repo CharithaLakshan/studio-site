@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FeaturedProduct from '../components/FeaturedProduct.astro';
+import ProductGrid from '../components/ProductGrid.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+import { site } from '../config/site';
+import { getFeaturedProduct, getProducts } from '../lib/products';
+import { url } from '../lib/url';
+
+const products = await getProducts();
+const featured = await getFeaturedProduct();
+---
+
+<BaseLayout description={site.intro}>
+  <section class="hero light-field" aria-labelledby="hero-title">
+    <div class="container hero-inner">
+      <h1 id="hero-title" class="display">{site.tagline}</h1>
+      <p class="lede">{site.intro}</p>
+    </div>
+  </section>
+
+  {
+    featured && (
+      <section class="container" aria-label="Featured product">
+        <FeaturedProduct product={featured} />
+      </section>
+    )
+  }
+
+  <section class="section container" aria-labelledby="products-title">
+    <div class="section-head">
+      <h2 id="products-title">Products</h2>
+      <a class="label" href={url('products/')}>All products by type</a>
+    </div>
+    <ProductGrid products={products} />
+  </section>
+
+  <section class="section container studio" aria-labelledby="studio-title">
+    <h2 id="studio-title">The studio</h2>
+    <div class="studio-body">
+      <p>
+        {site.name} is a one-person studio run by {site.owner.name} ("{site.owner.alias}"),
+        based in {site.owner.location}.
+      </p>
+      <p><a href={url('about/')}>More about the studio</a></p>
+    </div>
+    <SocialLinks />
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: var(--space-9) var(--space-8);
+  }
+
+  .hero-inner {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .hero h1 {
+    max-width: 16ch;
+  }
+
+  .hero .lede {
+    max-width: 38rem;
+  }
+
+  .studio {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .studio-body {
+    display: grid;
+    gap: var(--space-3);
+    max-width: var(--measure);
+  }
+
+  @media (min-width: 48rem) {
+    .studio {
+      grid-template-columns: 1fr 2fr;
+      align-items: start;
+    }
+
+    .studio :global(.social-links) {
+      grid-column: 2;
+    }
+  }
+</style>

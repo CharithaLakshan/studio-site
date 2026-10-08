@@ -1,0 +1,109 @@
+---
+import { Image } from 'astro:assets';
+import { responsive } from '../lib/images';
+import StatusBadge from './StatusBadge.astro';
+import { TYPE_LABELS, productUrl, type Product } from '../lib/products';
+
+interface Props {
+  product: Product;
+}
+const { product } = Astro.props;
+const d = product.data;
+---
+
+<article class="featured">
+  <div class="featured-media">
+    <Image
+      src={d.heroImage.src}
+      alt={d.heroImage.alt}
+      {...responsive(d.heroImage.src, [640, 1024, 1600, 2100], '(min-width: 76rem) 76rem, 100vw')}
+      loading="eager"
+    />
+  </div>
+  <div class="featured-body">
+    <p class="label">Featured · {TYPE_LABELS[d.type].one} · {d.platforms.join(', ')}</p>
+    <h2 class="featured-title">{d.title}</h2>
+    <p class="featured-tagline">{d.tagline}</p>
+    <div class="featured-actions">
+      <a class="button button--primary" href={productUrl(product)}>
+        View {d.title} <span class="button-arrow" aria-hidden="true">→</span>
+      </a>
+      <StatusBadge status={d.status} />
+    </div>
+  </div>
+</article>
+
+<style>
+  .featured {
+    position: relative;
+    display: grid;
+    border: 1px solid transparent;
+    border-radius: var(--radius-l);
+    background:
+      linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+      var(--rim) border-box;
+    box-shadow: var(--shadow-hero);
+    overflow: hidden;
+  }
+
+  .featured-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .featured-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .featured-body {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+    padding: var(--space-5);
+  }
+
+  .featured-title {
+    font-size: var(--step-3);
+  }
+
+  .featured-tagline {
+    font-size: var(--step-1);
+    color: var(--color-text-muted);
+  }
+
+  .featured-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-2);
+  }
+
+  /* Desktop: text sits on the vignetted lower-left of a 21:9 frame. */
+  @media (min-width: 48rem) {
+    .featured > * {
+      grid-area: 1 / 1;
+    }
+
+    .featured-media {
+      aspect-ratio: 21 / 9;
+    }
+
+    .featured-media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, rgb(11 12 14 / 0.95) 0%, rgb(11 12 14 / 0.6) 35%, transparent 65%),
+        linear-gradient(to right, rgb(11 12 14 / 0.7), transparent 55%);
+    }
+
+    .featured-body {
+      position: relative;
+      align-self: end;
+      max-width: 36rem;
+      padding: var(--space-7);
+    }
+  }
+</style>

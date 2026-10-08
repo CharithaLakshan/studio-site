@@ -1,0 +1,56 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import { site } from '../../../config/site';
+import { formatDate, getPrivacyPolicy, getProducts, productUrl, type Product } from '../../../lib/products';
+
+export const getStaticPaths = (async () => {
+  const products = (await getProducts()).filter((p) => p.data.hasPrivacyPolicy);
+  return Promise.all(
+    products.map(async (product) => ({
+      params: { slug: product.data.slug },
+      props: { product, policy: await getPrivacyPolicy(product) },
+    })),
+  );
+}) satisfies GetStaticPaths;
+
+const { product, policy } = Astro.props as {
+  product: Product;
+  policy: Awaited<ReturnType<typeof getPrivacyPolicy>>;
+};
+const { Content } = await render(policy);
+const title = `${product.data.title} privacy policy`;
+---
+
+<BaseLayout title={title} description={`How ${product.data.title} by ${site.name} handles your data.`}>
+  <PageHeader title={title} label={`${product.data.title} · ${site.name}`}>
+    <p class="label">
+      Last updated <time datetime={policy.data.lastUpdated.toISOString().slice(0, 10)}>
+        {formatDate(policy.data.lastUpdated)}
+      </time>
+    </p>
+  </PageHeader>
+  <div class="container">
+    <div class="prose">
+      <Content />
+      <h2>Who is responsible</h2>
+      <p>
+        {product.data.title} is made by {site.name}, the studio of {site.owner.name}.
+        {
+          site.email ? (
+            <>
+              Contact: <a href={`mailto:${site.email}`}>{site.email}</a>.
+            </>
+          ) : (
+            <>
+              Contact: <a href={site.socials.github}>GitHub</a>.
+            </>
+          )
+        }
+      </p>
+      <p><a href={productUrl(product)}>Back to {product.data.title}</a></p>
+    </div>
+  </div>
+</BaseLayout>

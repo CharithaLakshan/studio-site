@@ -1,0 +1,30 @@
+---
+import ProductCard from './ProductCard.astro';
+import type { Product } from '../lib/products';
+
+interface Props {
+  products: Product[];
+  headingLevel?: 'h2' | 'h3';
+}
+const { products, headingLevel } = Astro.props;
+---
+
+<ul class="product-grid" role="list">
+  {
+    products.map((product) => (
+      <li>
+        <ProductCard product={product} headingLevel={headingLevel} />
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--space-5);
+    padding: 0;
+    list-style: none;
+  }
+</style>

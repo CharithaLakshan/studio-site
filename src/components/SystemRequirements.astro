@@ -1,0 +1,62 @@
+---
+import type { Product } from '../lib/products';
+
+interface Props {
+  requirements: NonNullable<Product['data']['systemRequirements']>;
+}
+const { minimum, recommended } = Astro.props.requirements;
+const rows = [...new Set([...Object.keys(minimum), ...Object.keys(recommended ?? {})])];
+---
+
+<div class="sysreq">
+  <table>
+    <caption class="visually-hidden">System requirements</caption>
+    <thead>
+      <tr>
+        <th scope="col"><span class="visually-hidden">Component</span></th>
+        <th scope="col">Minimum</th>
+        {recommended && <th scope="col">Recommended</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr>
+            <th scope="row">{row}</th>
+            <td>{minimum[row] ?? '—'}</td>
+            {recommended && <td>{recommended[row] ?? '—'}</td>}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .sysreq {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+  }
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-3) var(--space-3) 0;
+    border-bottom: 1px solid var(--color-line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th,
+  tbody th {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+</style>

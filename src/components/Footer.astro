@@ -1,0 +1,55 @@
+---
+import Wordmark from './Wordmark.astro';
+import SocialLinks from './SocialLinks.astro';
+import { site } from '../config/site';
+import { url } from '../lib/url';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer-inner">
+    <div class="site-footer-brand">
+      <Wordmark />
+      <p class="site-footer-tagline">{site.tagline}</p>
+    </div>
+    <nav aria-label="Footer">
+      <SocialLinks />
+    </nav>
+    <p class="site-footer-meta">
+      © {year} {site.owner.name}. <a href={url('privacy/')}>Privacy</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-9);
+    border-top: 1px solid var(--color-line);
+    background: var(--color-surface);
+  }
+
+  .site-footer-inner {
+    display: grid;
+    gap: var(--space-5);
+    padding-block: var(--space-7);
+  }
+
+  .site-footer-tagline,
+  .site-footer-meta {
+    margin-top: var(--space-2);
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer-inner {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+
+    .site-footer-meta {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

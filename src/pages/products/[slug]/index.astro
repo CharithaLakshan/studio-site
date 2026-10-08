@@ -1,0 +1,196 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import { responsive } from '../../../lib/images';
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import FeatureList from '../../../components/FeatureList.astro';
+import Gallery from '../../../components/Gallery.astro';
+import SpecSheet from '../../../components/SpecSheet.astro';
+import SystemRequirements from '../../../components/SystemRequirements.astro';
+import Trailer from '../../../components/Trailer.astro';
+import { getProducts, type Product } from '../../../lib/products';
+import { productJsonLd, socialImageFor } from '../../../lib/seo';
+import { absolute, url } from '../../../lib/url';
+
+export const getStaticPaths = (async () => {
+  const products = await getProducts();
+  return products.map((product) => ({ params: { slug: product.data.slug }, props: { product } }));
+}) satisfies GetStaticPaths;
+
+const { product } = Astro.props as { product: Product };
+const d = product.data;
+const { Content } = await render(product);
+const image = await socialImageFor(d.heroImage.src, d.heroImage.alt);
+const jsonLd = productJsonLd(product, absolute(Astro.url.pathname), image);
+---
+
+<BaseLayout title={`${d.title}: ${d.tagline}`} description={d.summary} image={image} jsonLd={jsonLd}>
+  <article class="product">
+    <header class="product-hero">
+      <div class="product-hero-media">
+        <Image
+          src={d.heroImage.src}
+          alt={d.heroImage.alt}
+          {...responsive(d.heroImage.src, [640, 1024, 1600, 2100], '100vw')}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <div class="container product-hero-text">
+        <a class="label back-link" href={url('products/')}>← All products</a>
+        <h1 class="display">{d.title}</h1>
+        <p class="lede">{d.tagline}</p>
+      </div>
+    </header>
+
+    <div class="container product-layout">
+      <div class="product-aside">
+        <SpecSheet product={product} />
+      </div>
+
+      <div class="product-main">
+        <section aria-labelledby="about-title">
+          <h2 id="about-title" class="visually-hidden">About {d.title}</h2>
+          <div class="prose"><Content /></div>
+        </section>
+
+        {
+          d.features.length > 0 && (
+            <section aria-labelledby="features-title">
+              <h2 id="features-title">Key features</h2>
+              <FeatureList features={d.features} />
+            </section>
+          )
+        }
+
+        {
+          d.trailerYouTubeId && (
+            <section aria-labelledby="trailer-title">
+              <h2 id="trailer-title">Trailer</h2>
+              <Trailer youTubeId={d.trailerYouTubeId} title={d.title} poster={d.heroImage.src} />
+            </section>
+          )
+        }
+
+        {
+          d.screenshots.length > 0 && (
+            <section aria-labelledby="screens-title">
+              <h2 id="screens-title">Screenshots</h2>
+              <Gallery images={d.screenshots} />
+            </section>
+          )
+        }
+
+        {
+          d.systemRequirements && (
+            <section aria-labelledby="sysreq-title">
+              <h2 id="sysreq-title">System requirements</h2>
+              <SystemRequirements requirements={d.systemRequirements} />
+            </section>
+          )
+        }
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .product-hero {
+    display: grid;
+    position: relative;
+    isolation: isolate;
+  }
+
+  .product-hero > * {
+    grid-area: 1 / 1;
+  }
+
+  .product-hero-media {
+    position: relative;
+    z-index: -1;
+    aspect-ratio: 4 / 3;
+    max-height: 80vh;
+    overflow: hidden;
+  }
+
+  .product-hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Vignette: darkens the lower-left where the title sits. */
+  .product-hero-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, var(--color-void) 0%, rgb(11 12 14 / 0.75) 30%, transparent 70%),
+      radial-gradient(120% 90% at 50% 30%, transparent 50%, rgb(11 12 14 / 0.6) 100%);
+  }
+
+  .product-hero-text {
+    align-self: end;
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+    padding-bottom: var(--space-6);
+  }
+
+  .back-link {
+    text-decoration: none;
+    color: var(--color-text-muted);
+    padding-block: var(--space-2);
+  }
+
+  .back-link:hover {
+    color: var(--color-text);
+  }
+
+  .product-hero-text .lede {
+    max-width: 36rem;
+    color: var(--color-text);
+  }
+
+  .product-layout {
+    display: grid;
+    gap: var(--space-7);
+    padding-top: var(--space-6);
+  }
+
+  .product-main {
+    display: grid;
+    gap: var(--space-8);
+    min-width: 0;
+  }
+
+  .product-main h2:not(.visually-hidden) {
+    margin-bottom: var(--space-5);
+  }
+
+  @media (min-width: 48rem) {
+    .product-hero-media {
+      aspect-ratio: 21 / 9;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .product-layout {
+      grid-template-columns: minmax(0, 1fr) 22rem;
+      align-items: start;
+    }
+
+    .product-aside {
+      grid-column: 2;
+      grid-row: 1;
+      position: sticky;
+      top: var(--space-5);
+    }
+
+    .product-main {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+</style>

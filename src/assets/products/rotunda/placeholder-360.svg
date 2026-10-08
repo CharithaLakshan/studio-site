@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900"><defs>
+    <radialGradient id="key" cx="0.72" cy="0.2" r="0.65">
+      <stop offset="0" stop-color="#f2b66d" stop-opacity="0.5"/>
+      <stop offset="0.45" stop-color="#f2b66d" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#f2b66d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fill" cx="0.12" cy="0.95" r="0.7">
+      <stop offset="0" stop-color="#4a5d7a" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#4a5d7a" stop-opacity="0"/>
+    </radialGradient>
+  </defs><rect width="1600" height="900" fill="#0b0c0e"/><rect width="1600" height="900" fill="url(#fill)"/><rect width="1600" height="900" fill="url(#key)"/><g fill="none" stroke="#edeae4"><rect x="200" y="170" width="1200" height="560" stroke-opacity="0.35" stroke-width="2"/><line x1="300" y1="170" x2="300" y2="730" stroke-opacity="0.1"/><line x1="400" y1="170" x2="400" y2="730" stroke-opacity="0.1"/><line x1="500" y1="170" x2="500" y2="730" stroke-opacity="0.1"/><line x1="600" y1="170" x2="600" y2="730" stroke-opacity="0.1"/><line x1="700" y1="170" x2="700" y2="730" stroke-opacity="0.1"/><line x1="800" y1="170" x2="800" y2="730" stroke-opacity="0.1"/><line x1="900" y1="170" x2="900" y2="730" stroke-opacity="0.1"/><line x1="1000" y1="170" x2="1000" y2="730" stroke-opacity="0.1"/><line x1="1100" y1="170" x2="1100" y2="730" stroke-opacity="0.1"/><line x1="1200" y1="170" x2="1200" y2="730" stroke-opacity="0.1"/><line x1="1300" y1="170" x2="1300" y2="730" stroke-opacity="0.1"/><path d="M200 263.3333333333333 C 560 245.33333333333331, 1040 245.33333333333331, 1400 263.3333333333333" stroke-opacity="0.12"/><path d="M200 356.66666666666663 C 560 338.66666666666663, 1040 338.66666666666663, 1400 356.66666666666663" stroke-opacity="0.12"/><path d="M200 450 C 560 450, 1040 450, 1400 450" stroke-opacity="0.4"/><path d="M200 543.3333333333333 C 560 561.3333333333333, 1040 561.3333333333333, 1400 543.3333333333333" stroke-opacity="0.12"/><path d="M200 636.6666666666667 C 560 654.6666666666667, 1040 654.6666666666667, 1400 636.6666666666667" stroke-opacity="0.12"/></g><g font-family="ui-monospace, Menlo, Consolas, monospace" font-size="26" letter-spacing="3" fill="#edeae4">
+    <rect x="38" y="810" width="388.8" height="58" rx="6" fill="#0b0c0e" fill-opacity="0.72" stroke="#f2b66d" stroke-opacity="0.6"/>
+    <text x="56" y="850">PLACEHOLDER · 360°</text>
+  </g></svg>
